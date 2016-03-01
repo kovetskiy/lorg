@@ -1,7 +1,7 @@
 ### TODO
 
 - [ ] write godoc
-- [ ] write basic placeholders
+- [x] write basic placeholders
 - [ ] write examples
 
 #### Placeholders
