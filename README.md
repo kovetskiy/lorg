@@ -8,5 +8,5 @@
 
 - [x] Level
 - [x] Line
-- [ ] File (long/short)
+- [x] File (long/short)
 - [ ] Time

@@ -1,6 +1,7 @@
 package lorg
 
 import (
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"testing"
@@ -21,5 +22,23 @@ func TestPlaceholderLine(t *testing.T) {
 	) // +3
 	assert.Equal( // +4
 		t, strconv.Itoa(line+5), placeholderLine(LevelWarning, "blah"), // +5
+	)
+}
+
+func TestPlaceholderFile(t *testing.T) {
+	_, file, _, _ := runtime.Caller(0)
+
+	assert.Equal(
+		t, filepath.Base(file), placeholderFile(LevelDebug, "short"),
+	)
+	assert.Equal(
+		t, filepath.Base(file), placeholderFile(LevelInfo, ""),
+	)
+
+	assert.Equal(
+		t, file, placeholderFile(LevelDebug, "long"),
+	)
+	assert.Equal(
+		t, file, placeholderFile(LevelWarning, "long"),
 	)
 }
