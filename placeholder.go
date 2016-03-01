@@ -1,11 +1,15 @@
 package lorg
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
+	"time"
 )
+
+type Placeholder func(level Level, arg string) string
 
 var (
 	rePlaceholder = regexp.MustCompile(`\${(\w+)(:([^}]+))?}`)
@@ -13,10 +17,14 @@ var (
 	defaultPlaceholders = map[string]Placeholder{
 		"level": placeholderLevel,
 		"line":  placeholderLine,
+		"file":  placeholderFile,
+		"time":  placeholderTime,
 	}
 )
 
-type Placeholder func(level Level, arg string) string
+const (
+	placeholderTimeLayout = "2006-01-02 15:04:05"
+)
 
 func placeholderLevel(logLevel Level, arg string) string {
 	return logLevel.String()
@@ -42,4 +50,16 @@ func placeholderFile(logLevel Level, mode string) string {
 	}
 
 	return filepath.Base(file)
+}
+
+func placeholderTime(logLevel Level, layout string) string {
+	if layout == "timestamp" {
+		return fmt.Sprint(time.Now().Unix())
+	}
+
+	if layout == "" {
+		layout = placeholderTimeLayout
+	}
+
+	return time.Now().Format(layout)
 }

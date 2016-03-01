@@ -1,10 +1,12 @@
 package lorg
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -40,5 +42,25 @@ func TestPlaceholderFile(t *testing.T) {
 	)
 	assert.Equal(
 		t, file, placeholderFile(LevelWarning, "long"),
+	)
+}
+
+func TestPlaceholderTime(t *testing.T) {
+	assert.Equal(
+		t,
+		fmt.Sprint(time.Now().Unix()),
+		placeholderTime(LevelDebug, "timestamp"),
+	)
+
+	assert.Equal(
+		t,
+		time.Now().Format(placeholderTimeLayout),
+		placeholderTime(LevelDebug, ""),
+	)
+
+	assert.Equal(
+		t,
+		time.Now().Format(time.Kitchen),
+		placeholderTime(LevelDebug, time.Kitchen),
 	)
 }

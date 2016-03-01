@@ -9,4 +9,4 @@
 - [x] Level
 - [x] Line
 - [x] File (long/short)
-- [ ] Time
+- [x] Time
