@@ -1,6 +1,8 @@
 package lorg
 
 import (
+	"runtime"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +15,11 @@ func TestPlaceholderLevel(t *testing.T) {
 }
 
 func TestPlaceholderLine(t *testing.T) {
-	assert.Equal(t, "16", placeholderLine(LevelDebug, ""))
-	assert.Equal(t, "17", placeholderLine(LevelWarning, "blah"))
+	_, _, line, _ := runtime.Caller(0)
+	assert.Equal( // +1
+		t, strconv.Itoa(line+2), placeholderLine(LevelDebug, ""), // +2
+	) // +3
+	assert.Equal( // +4
+		t, strconv.Itoa(line+5), placeholderLine(LevelWarning, "blah"), // +5
+	)
 }
