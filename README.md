@@ -7,6 +7,6 @@
 #### Placeholders
 
 - [x] Level
-- [ ] Line
+- [x] Line
 - [ ] File (long/short)
 - [ ] Time
