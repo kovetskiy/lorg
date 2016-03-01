@@ -1,15 +1,6 @@
 package lorg
 
-import (
-	"regexp"
-	"strings"
-)
-
-var (
-	rePlaceholder = regexp.MustCompile(`\${(\w+)(:([^}]+))?}`)
-
-	defaultPlaceholders = map[string]Placeholder{}
-)
+import "strings"
 
 type Format struct {
 	rawFormat    string
