@@ -5,9 +5,13 @@ import (
 	"os"
 )
 
+const (
+	DefaultFormatting = `${date} ${level} %s`
+)
+
 var (
 	defaultLevel  = LevelInfo
-	defaultFormat = &Format{}
+	defaultFormat = NewFormat(DefaultFormatting)
 	defaultOutput = os.Stderr
 )
 
