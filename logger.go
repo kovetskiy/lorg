@@ -19,21 +19,21 @@ package lorg
 // not log anything until package-user want to see package debug messages and
 // sets logger using yourPackage.SetLog(someLogger)
 type Logger interface {
-	Fatal(args ...interface{})
-	Fatalf(format string, args ...interface{})
+	Fatal(values ...interface{})
+	Fatalf(format string, values ...interface{})
 
-	Error(args ...interface{})
-	Errorf(format string, args ...interface{})
+	Error(values ...interface{})
+	Errorf(format string, values ...interface{})
 
-	Warning(args ...interface{})
-	Warningf(format string, args ...interface{})
+	Warning(values ...interface{})
+	Warningf(format string, values ...interface{})
 
-	Print(args ...interface{})
-	Printf(format string, args ...interface{})
+	Print(values ...interface{})
+	Printf(format string, values ...interface{})
 
-	Info(args ...interface{})
-	Infof(format string, args ...interface{})
+	Info(values ...interface{})
+	Infof(format string, values ...interface{})
 
-	Debug(args ...interface{})
-	Debugf(format string, args ...interface{})
+	Debug(values ...interface{})
+	Debugf(format string, values ...interface{})
 }

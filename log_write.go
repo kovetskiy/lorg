@@ -11,7 +11,7 @@ func (log *Log) write(message string) error {
 	return err
 }
 
-func (log *Log) log(level Level, args []interface{}) {
+func (log *Log) log(level Level, value ...interface{}) {
 	if log.level < level {
 		return
 	}
@@ -19,7 +19,7 @@ func (log *Log) log(level Level, args []interface{}) {
 	format := log.format.Render(level)
 
 	// there is no need for Sprintf, so just replace %s to message
-	message := strings.Replace(format, "%s", fmt.Sprint(args...), 1)
+	message := strings.Replace(format, "%s", fmt.Sprint(value...), 1)
 	message = message + "\n"
 
 	err := log.write(message)
@@ -29,16 +29,11 @@ func (log *Log) log(level Level, args []interface{}) {
 }
 
 func (log *Log) logf(
-	level Level, format string, args []interface{},
+	level Level, format string, value ...interface{},
 ) {
 	if log.level < level {
 		return
 	}
 
-	log.log(
-		level,
-		[]interface{}{
-			fmt.Sprintf(format, args...),
-		},
-	)
+	log.log(level, fmt.Sprintf(format, value...))
 }

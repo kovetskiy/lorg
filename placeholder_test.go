@@ -16,8 +16,8 @@ type placeholderFabric struct {
 
 func (fabric *placeholderFabric) fabricate(name string) Placeholder {
 	// create a function and pass placeholder name by reference
-	return func(_ Level, arg string) string {
-		message := fmt.Sprintf("[%s@%s]", name, arg)
+	return func(_ Level, value string) string {
+		message := fmt.Sprintf("[%s@%s]", name, value)
 		fabric.log = append(fabric.log, message)
 		return message
 	}

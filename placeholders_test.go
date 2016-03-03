@@ -54,7 +54,7 @@ func TestPlaceholderTime(t *testing.T) {
 
 	assert.Equal(
 		t,
-		time.Now().Format(placeholderTimeLayout),
+		time.Now().Format(PlaceholderTimeDefaultLayout),
 		PlaceholderTime(LevelDebug, ""),
 	)
 

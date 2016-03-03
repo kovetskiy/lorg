@@ -33,7 +33,7 @@ type Log struct {
 	format Formatter
 }
 
-// Creates a new Log instance with default configuration:
+// NewLog creates a new Log instance with default configuration:
 // *   default logging level is the LevelInfo, which can be changed
 //         using log.SetLevel(Level) method
 // *   default logging format is the Format{} instance, which implements
@@ -72,7 +72,8 @@ func (log *Log) SetFormat(format Formatter) {
 	log.format = format
 }
 
-// The log records are fmt.Printfd'd to this io.Writer.
+// SetOutput sets output of given log instance, the log records are
+// fmt.Printfd'd to specified io.Writer.
 //
 // Running SetOutput it's not required operation, by default Log instance
 // logs all records to stderr (os.Stderr)
@@ -83,73 +84,73 @@ func (log *Log) SetOutput(output io.Writer) {
 // Fatal logs record if given logger level is equal or above LevelFatal, and
 // calls os.Exit(1) after logging.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Fatal(args ...interface{}) {
-	log.log(LevelFatal, args)
+func (log *Log) Fatal(value ...interface{}) {
+	log.log(LevelFatal, value...)
 	os.Exit(1)
 }
 
-// Debugf logs record if given logger level is equal or above LevelDebug, and
+// Fatalf logs record if given logger level is equal or above LevelFatal, and
 // calls os.Exit(1) after logging.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Fatalf(format string, args ...interface{}) {
-	log.logf(LevelFatal, format, args)
+func (log *Log) Fatalf(format string, value ...interface{}) {
+	log.logf(LevelFatal, format, value...)
 	os.Exit(1)
 }
 
 // Error logs record if given logger level is equal or above LevelError.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Error(args ...interface{}) {
-	log.log(LevelError, args)
+func (log *Log) Error(value ...interface{}) {
+	log.log(LevelError, value...)
 }
 
 // Errorf logs record if given logger level is equal or above LevelError.
 // Arguments are handled in the manner of fmt.Printf.
-func (log *Log) Errorf(format string, args ...interface{}) {
-	log.logf(LevelError, format, args)
+func (log *Log) Errorf(format string, value ...interface{}) {
+	log.logf(LevelError, format, value...)
 }
 
 // Warning logs record if given logger level is equal or above LevelWarning.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Warning(args ...interface{}) {
-	log.log(LevelWarning, args)
+func (log *Log) Warning(value ...interface{}) {
+	log.log(LevelWarning, value...)
 }
 
 // Warningf logs record if given logger level is equal or above LevelWarning.
 // Arguments are handled in the manner of fmt.Printf.
-func (log *Log) Warningf(format string, args ...interface{}) {
-	log.logf(LevelWarning, format, args)
+func (log *Log) Warningf(format string, value ...interface{}) {
+	log.logf(LevelWarning, format, value...)
 }
 
-// Printf is pseudonym for Info
-func (log *Log) Print(args ...interface{}) {
-	log.Info(args...)
+// Print is pseudonym for Info
+func (log *Log) Print(value ...interface{}) {
+	log.Info(value...)
 }
 
 // Printf is pseudonym for Infof
-func (log *Log) Printf(format string, args ...interface{}) {
-	log.Infof(format, args...)
+func (log *Log) Printf(format string, value ...interface{}) {
+	log.Infof(format, value...)
 }
 
 // Info logs record if given logger level is equal or above LevelInfo.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Info(args ...interface{}) {
-	log.log(LevelInfo, args)
+func (log *Log) Info(value ...interface{}) {
+	log.log(LevelInfo, value...)
 }
 
-// Info logs record if given logger level is equal or above LevelInfo.
+// Infof logs record if given logger level is equal or above LevelInfo.
 // Arguments are handled in the manner of fmt.Printf.
-func (log *Log) Infof(format string, args ...interface{}) {
-	log.logf(LevelInfo, format, args)
+func (log *Log) Infof(format string, value ...interface{}) {
+	log.logf(LevelInfo, format, value...)
 }
 
 // Debug logs record if given logger level is equal or above LevelDebug.
 // Arguments are handled in the manner of fmt.Print.
-func (log *Log) Debug(args ...interface{}) {
-	log.log(LevelDebug, args)
+func (log *Log) Debug(value ...interface{}) {
+	log.log(LevelDebug, value...)
 }
 
-// Debug logs record if given logger level is equal or above LevelDebug.
+// Debugf logs record if given logger level is equal or above LevelDebug.
 // Arguments are handled in the manner of fmt.Printf.
-func (log *Log) Debugf(format string, args ...interface{}) {
-	log.logf(LevelDebug, format, args)
+func (log *Log) Debugf(format string, value ...interface{}) {
+	log.logf(LevelDebug, format, value...)
 }

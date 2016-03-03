@@ -2,6 +2,10 @@ package lorg
 
 import "strings"
 
+// Format is the actual Formatter which used by Log structure for formatting
+// log records before writing log records into Log.output.
+//
+// Do not instantiate Format instance without using NewFormat.
 type Format struct {
 	rawFormat    string
 	compiled     bool
@@ -15,6 +19,12 @@ type replacement struct {
 	placeholderArg string
 }
 
+// NewFormat creates Format instance with specified formatting and default
+// placeholders: level (PlaceholderLevel), date (PlaceholderDate), line
+// (PlaceholderLine) and file (PlaceholderFile).
+//
+// Format placeholders can be changed or added using SetPlaceholders or SetPlaceholder
+// methods.
 func NewFormat(rawFormat string) *Format {
 	format := &Format{
 		rawFormat:    rawFormat,
@@ -24,25 +34,31 @@ func NewFormat(rawFormat string) *Format {
 	return format
 }
 
+// SetPlaceholder sets specified placeholder with specified placeholder name
+// for given format.
 func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 	format.placeholders[name] = placeholder
 }
 
+// SetPlaceholders sets specified placeholders for given format.
 func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
 	format.placeholders = placeholders
 }
 
+// GetPlaceholders returns placeholders of given format.
 func (format *Format) GetPlaceholders() map[string]Placeholder {
 	return format.placeholders
 }
 
+// Reset resets state of given format.
 func (format *Format) Reset() {
 	format.replacements = []replacement{}
 	format.compiled = false
 }
 
-// here is logLevel property just for a placeholders which want to show
-// logging level
+// Render generates string which will be used by Log instance.
+// Here is logLevel property just for a placeholders which want to show
+// logging level, logLevel will be passed to all ran placeholders.
 func (format *Format) Render(logLevel Level) string {
 	if !format.compiled {
 		format.compile()
