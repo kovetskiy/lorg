@@ -7,7 +7,7 @@ import "strings"
 //
 // Do not instantiate Format instance without using NewFormat.
 type Format struct {
-	rawFormat    string
+	formatting   string
 	compiled     bool
 	replacements []replacement
 	placeholders map[string]Placeholder
@@ -25,9 +25,9 @@ type replacement struct {
 //
 // Format placeholders can be changed or added using SetPlaceholders or
 // SetPlaceholder methods.
-func NewFormat(rawFormat string) *Format {
+func NewFormat(formatting string) *Format {
 	format := &Format{
-		rawFormat: rawFormat,
+		formatting: formatting,
 	}
 
 	// we are should not assing format.placeholders to defaultPlaceholders
@@ -72,7 +72,7 @@ func (format *Format) Render(logLevel Level) string {
 		format.compile()
 	}
 
-	rendered := format.rawFormat
+	rendered := format.formatting
 	for _, replacement := range format.replacements {
 		placeholderValue := replacement.placeholder(
 			logLevel,
@@ -91,7 +91,7 @@ func (format *Format) compile() {
 	// reset compiled replacements
 	format.Reset()
 
-	matches := rePlaceholder.FindAllStringSubmatch(format.rawFormat, -1)
+	matches := rePlaceholder.FindAllStringSubmatch(format.formatting, -1)
 	for _, match := range matches {
 		var (
 			replacementValue = match[0]
