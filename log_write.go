@@ -25,7 +25,7 @@ func (log *Log) logf(level Level, format string, value ...interface{}) {
 func (log *Log) doLog(level Level, value ...interface{}) {
 	format := log.format.Render(level)
 
-	// there is no need for Sprintf, so just replace %s to message
+	// here is no need for Sprintf, so just replace %s to message
 	message := strings.Replace(format, "%s", fmt.Sprint(value...), 1)
 	message = message + "\n"
 
