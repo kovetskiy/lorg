@@ -1,6 +1,8 @@
 ### TODO
 
-- [ ] write godoc
+- [ ] code review
+- [ ] grammarnazi nitpicks fixes
+- [x] write godoc
 - [x] write basic placeholders
 - [ ] write examples
 
