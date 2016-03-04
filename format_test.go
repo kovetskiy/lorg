@@ -73,20 +73,17 @@ func TestFormat_SetPlaceholder_ChangesPlaceholdersField(t *testing.T) {
 	// TestFormat_SetPlaceholders_ChangesPlaceholdersField
 	format := NewFormat(``)
 
-	placeholderFoo := Placeholder(
-		func(_ Level, _ string) string { return "foo" },
-	)
+	placeholderFoo := func(_ Level, _ string) string { return "foo" }
+	placeholderBar := func(_ Level, _ string) string { return "bar" }
+
 	format.SetPlaceholder("place_foo", placeholderFoo)
 
-	assert.Equal(t, len(defaultPlaceholders)+1, len(format.placeholders))
+	assert.Len(t, format.placeholders, len(defaultPlaceholders)+1)
 	assert.Contains(t, format.placeholders, "place_foo")
 
-	placeholderBar := Placeholder(
-		func(_ Level, _ string) string { return "bar" },
-	)
 	format.SetPlaceholder("place_bar", placeholderBar)
 
-	assert.Equal(t, len(defaultPlaceholders)+2, len(format.placeholders))
+	assert.Len(t, format.placeholders, len(defaultPlaceholders)+2)
 	assert.Contains(t, format.placeholders, "place_foo")
 	assert.Contains(t, format.placeholders, "place_bar")
 }
