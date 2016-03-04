@@ -6,16 +6,23 @@ import (
 	"strings"
 )
 
-func (log *Log) write(message string) error {
-	_, err := log.output.Write([]byte(message))
-	return err
-}
-
 func (log *Log) log(level Level, value ...interface{}) {
 	if log.level < level {
 		return
 	}
 
+	log.doLog(level, value...)
+}
+
+func (log *Log) logf(level Level, format string, value ...interface{}) {
+	if log.level < level {
+		return
+	}
+
+	log.doLog(level, fmt.Sprintf(format, value...))
+}
+
+func (log *Log) doLog(level Level, value ...interface{}) {
 	format := log.format.Render(level)
 
 	// there is no need for Sprintf, so just replace %s to message
@@ -28,12 +35,7 @@ func (log *Log) log(level Level, value ...interface{}) {
 	}
 }
 
-func (log *Log) logf(
-	level Level, format string, value ...interface{},
-) {
-	if log.level < level {
-		return
-	}
-
-	log.log(level, fmt.Sprintf(format, value...))
+func (log *Log) write(message string) error {
+	_, err := log.output.Write([]byte(message))
+	return err
 }
