@@ -30,6 +30,9 @@ func NewFormat(rawFormat string) *Format {
 		rawFormat: rawFormat,
 	}
 
+	// we are should not assing format.placeholders to defaultPlaceholders
+	// because maps in go passes by reference.
+
 	format.SetPlaceholders(defaultPlaceholders)
 
 	return format
