@@ -12,7 +12,7 @@ const (
 	//
 	// See Format structure documentation for information about `${date}` and
 	// `${level}` placeholders.
-	DefaultFormatting = `${date} ${level} %s`
+	DefaultFormatting = `[${level}] ${time} %s`
 )
 
 var (
