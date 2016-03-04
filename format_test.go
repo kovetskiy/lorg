@@ -12,7 +12,7 @@ func TestNewFormat_ReturnsFormatWithDefaultFiends(t *testing.T) {
 	assert.Len(t, format.placeholders, len(defaultPlaceholders))
 
 	keys := []string{}
-	for key, _ := range defaultPlaceholders {
+	for key := range defaultPlaceholders {
 		keys = append(keys, key)
 	}
 

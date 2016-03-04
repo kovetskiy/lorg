@@ -14,17 +14,17 @@ type Format struct {
 }
 
 type replacement struct {
-	value          string
-	placeholder    Placeholder
-	placeholderArg string
+	value            string
+	placeholder      Placeholder
+	placeholderValue string
 }
 
 // NewFormat creates Format instance with specified formatting and default
 // placeholders: level (PlaceholderLevel), date (PlaceholderDate), line
 // (PlaceholderLine) and file (PlaceholderFile).
 //
-// Format placeholders can be changed or added using SetPlaceholders or SetPlaceholder
-// methods.
+// Format placeholders can be changed or added using SetPlaceholders or
+// SetPlaceholder methods.
 func NewFormat(rawFormat string) *Format {
 	format := &Format{
 		rawFormat: rawFormat,
@@ -76,7 +76,7 @@ func (format *Format) Render(logLevel Level) string {
 	for _, replacement := range format.replacements {
 		placeholderValue := replacement.placeholder(
 			logLevel,
-			replacement.placeholderArg,
+			replacement.placeholderValue,
 		)
 
 		rendered = strings.Replace(
@@ -96,7 +96,7 @@ func (format *Format) compile() {
 		var (
 			replacementValue = match[0]
 			placeholderName  = match[1]
-			placeholderArg   = match[3]
+			placeholderValue = match[3]
 		)
 
 		placeholder, ok := format.placeholders[placeholderName]
@@ -106,9 +106,9 @@ func (format *Format) compile() {
 		}
 
 		newReplacement := replacement{
-			value:          replacementValue,
-			placeholder:    placeholder,
-			placeholderArg: placeholderArg,
+			value:            replacementValue,
+			placeholder:      placeholder,
+			placeholderValue: placeholderValue,
 		}
 
 		format.replacements = append(format.replacements, newReplacement)
