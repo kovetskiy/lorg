@@ -23,7 +23,7 @@ func (fabric *placeholderFabric) fabricate(name string) Placeholder {
 	}
 }
 
-func TestPlaceholderRunning(t *testing.T) {
+func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 	fabric := new(placeholderFabric)
 
 	format := NewFormat(
@@ -82,7 +82,7 @@ func TestPlaceholderRunning(t *testing.T) {
 	)
 }
 
-func TestFormatPassesLogLevelToPlaceholders(t *testing.T) {
+func TestFormat_Render_CallsSettedPlaceholdersAndPassesLogLevel(t *testing.T) {
 	format := NewFormat(`${place_foo}`)
 
 	var placeholderLogLevel Level = -1

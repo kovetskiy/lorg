@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLogFatal(t *testing.T) {
+func TestLog_Fatal_ExitWithCode1(t *testing.T) {
 	testcaseEnv := os.Getenv("TESTCASE")
 
 	switch testcaseEnv {
@@ -42,7 +42,7 @@ func TestLogFatal(t *testing.T) {
 	}
 
 	for _, testcase := range testcases {
-		err := assertLogFatalExit(
+		err := assertLogFatalExits(
 			t,
 			"TESTCASE="+testcase,
 			"[testcase] TESTCASE: "+testcase+"\n",
@@ -53,10 +53,10 @@ func TestLogFatal(t *testing.T) {
 	}
 }
 
-func assertLogFatalExit(
+func assertLogFatalExits(
 	t *testing.T, env string, expectedOutput string,
 ) error {
-	cmd := exec.Command(os.Args[0], "-test.run=TestLogFatal")
+	cmd := exec.Command(os.Args[0], "-test.run=TestLog_Fatal_ExitWithCode1")
 	cmd.Env = append(os.Environ(), env)
 
 	stderr, err := cmd.StderrPipe()

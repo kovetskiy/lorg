@@ -10,19 +10,18 @@ import (
 type mockFormat struct {
 	lastLogLevel Level
 	callsRender  int
-	callsReset   int
 }
 
 func (mock *mockFormat) SetPlaceholders(_ map[string]Placeholder) {
-	panic("should be not called")
+	panic("SetPlaceholders method should not be called")
 }
 
 func (mock *mockFormat) SetPlaceholder(_ string, _ Placeholder) {
-	panic("should be not called")
+	panic("SetPlaceholder method should not be called")
 }
 
 func (mock *mockFormat) GetPlaceholders() map[string]Placeholder {
-	panic("should be not called")
+	panic("GetPlaceholder method should not be called")
 }
 
 func (mock *mockFormat) Render(logLevel Level) string {
@@ -31,15 +30,9 @@ func (mock *mockFormat) Render(logLevel Level) string {
 	return "[testcase] %s"
 }
 
-func (mock *mockFormat) Reset() {
-	mock.callsReset++
-}
+func (mock *mockFormat) Reset() {}
 
-func TestLogImplementsLogger(t *testing.T) {
-	assert.Implements(t, (*Logger)(nil), NewLog())
-}
-
-func TestLogDefaults(t *testing.T) {
+func TestNewLog_ReturnsLogWithDefaultFields(t *testing.T) {
 	log := NewLog()
 
 	assert.Equal(
@@ -58,7 +51,11 @@ func TestLogDefaults(t *testing.T) {
 	)
 }
 
-func TestLogSetFormat(t *testing.T) {
+func TestLog_ImplementsLoggerInterface(t *testing.T) {
+	assert.Implements(t, (*Logger)(nil), &Log{})
+}
+
+func TestLog_SetFormat_ChangesFormatField(t *testing.T) {
 	mock := new(mockFormat)
 
 	log := NewLog()
@@ -67,21 +64,21 @@ func TestLogSetFormat(t *testing.T) {
 	assert.Equal(t, mock, log.format)
 }
 
-func TestLogSetLevel(t *testing.T) {
+func TestLog_SetLevel_ChangesLevelField(t *testing.T) {
 	log := NewLog()
 	log.SetLevel(LevelWarning)
 
 	assert.Equal(t, LevelWarning, log.level)
 }
 
-func TestSetOutput(t *testing.T) {
+func TestLog_SetOutput_ChangesOutputField(t *testing.T) {
 	log := NewLog()
 	log.SetOutput(ioutil.Discard)
 
 	assert.Equal(t, ioutil.Discard, log.output)
 }
 
-func TestLogCallFormatRender(t *testing.T) {
+func TestLog_LoggingFunctions_CallsFormatRender(t *testing.T) {
 	mock := new(mockFormat)
 
 	log := NewLog()
@@ -109,7 +106,9 @@ func TestLogCallFormatRender(t *testing.T) {
 	assert.Equal(t, 10, mock.callsRender)
 }
 
-func TestLogAsLoggerWork(t *testing.T) {
+func TestLog_LoggingFunctions_LogsRecordsWithSameLevelOrAbove(
+	t *testing.T,
+) {
 	log := NewLog()
 
 	// Fatal tested in special function

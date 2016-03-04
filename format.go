@@ -27,9 +27,10 @@ type replacement struct {
 // methods.
 func NewFormat(rawFormat string) *Format {
 	format := &Format{
-		rawFormat:    rawFormat,
-		placeholders: defaultPlaceholders,
+		rawFormat: rawFormat,
 	}
+
+	format.SetPlaceholders(defaultPlaceholders)
 
 	return format
 }
@@ -42,7 +43,11 @@ func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 
 // SetPlaceholders sets specified placeholders for given format.
 func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
-	format.placeholders = placeholders
+	format.placeholders = map[string]Placeholder{}
+
+	for placeholderName, placeholder := range placeholders {
+		format.placeholders[placeholderName] = placeholder
+	}
 }
 
 // GetPlaceholders returns placeholders of given format.
