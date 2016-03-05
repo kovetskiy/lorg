@@ -41,10 +41,10 @@ const (
 	// See more about time layouts in package time documentation.
 	PlaceholderTimeDefaultLayout = "2006-01-02 15:04:05"
 
-	// PlaceholderCallStackTraceLevel should be used as argument to
+	// PlaceholderCallStackLevel should be used as argument to
 	// runtime.Caller if placeholder want to get information about calling log
 	// functions.
-	PlaceholderCallStackTraceLevel = 5
+	PlaceholderCallStackLevel = 5
 )
 
 // PlaceholderLevel returns level of current logging record.
@@ -58,7 +58,7 @@ func PlaceholderLevel(logLevel Level, _ string) string {
 //
 // Using: ${line}
 func PlaceholderLine(logLevel Level, _ string) string {
-	_, _, line, ok := runtime.Caller(PlaceholderCallStackTraceLevel)
+	_, _, line, ok := runtime.Caller(PlaceholderCallStackLevel)
 	if !ok {
 		return "??"
 	}
@@ -74,7 +74,7 @@ func PlaceholderLine(logLevel Level, _ string) string {
 //    * "long":    a final file name will be retuned as is.
 //                     Using: ${file:long}
 func PlaceholderFile(logLevel Level, mode string) string {
-	_, file, _, ok := runtime.Caller(PlaceholderCallStackTraceLevel)
+	_, file, _, ok := runtime.Caller(PlaceholderCallStackLevel)
 	if !ok {
 		return "??"
 	}

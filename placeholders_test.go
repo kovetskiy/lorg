@@ -119,7 +119,7 @@ func callPlaceholderAtDeepStackLevel(
 
 	return doRecursiveCallPlaceholder(
 		placeholder, logLevel, placeholderValue,
-		actualStackLevel, PlaceholderCallLevel,
+		actualStackLevel, PlaceholderCallStackLevel,
 	)
 }
 
