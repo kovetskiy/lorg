@@ -42,52 +42,50 @@ func TestLog_Fatal_ExitWithCode1(t *testing.T) {
 	}
 
 	for _, testcase := range testcases {
-		err := assertLogFatalExits(
-			t,
-			"TESTCASE="+testcase,
-			"[testcase] TESTCASE: "+testcase+"\n",
+		output, status, err := runLogFatalTestcase(
+			testcase,
 		)
 		if err != nil {
-			t.Fatalf("%s testcase failed: %s", testcase, err)
+			assert.FailNow(t, "%s testcase failed: %s", testcase, err)
 		}
+
+		assert.Equal(t, 1, status)
+		assert.Equal(t, "[testcase] TESTCASE: "+testcase+"\n", output)
 	}
 }
 
-func assertLogFatalExits(
-	t *testing.T, env string, expectedOutput string,
-) error {
+func runLogFatalTestcase(
+	testcase string,
+) (output string, status int, err error) {
 	cmd := exec.Command(os.Args[0], "-test.run=TestLog_Fatal_ExitWithCode1")
-	cmd.Env = append(os.Environ(), env)
+	cmd.Env = append(os.Environ(), "TESTCASE="+testcase)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return "", 0, err
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return "", 0, err
 	}
 
 	stderrData, err := ioutil.ReadAll(stderr)
 	if err != nil {
-		return fmt.Errorf("can't read stderr: %s", err)
+		return "", 0, fmt.Errorf("can't read stderr: %s", err)
 	}
 
 	err = cmd.Wait()
 	if err == nil {
-		return fmt.Errorf("process exited with status 0")
+		return "", 0, fmt.Errorf("process exited with status 0")
 	}
 
-	exiterr, ok := err.(*exec.ExitError)
+	exitErr, ok := err.(*exec.ExitError)
 	if !ok {
-		return fmt.Errorf("can't run process: %s", err)
+		return "", 0, fmt.Errorf("can't run process: %s", err)
 	}
 
-	status := exiterr.Sys().(syscall.WaitStatus).ExitStatus()
-	assert.Equal(t, 1, status)
-
-	assert.Equal(t, expectedOutput, string(stderrData))
-
-	return nil
+	return string(stderrData),
+		exitErr.Sys().(syscall.WaitStatus).ExitStatus(),
+		nil
 }
