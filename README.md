@@ -4,7 +4,7 @@
 - [ ] grammarnazi nitpicks fixes
 - [x] write godoc
 - [x] write basic placeholders
-- [ ] write examples
+- [x] write examples
 
 #### Placeholders
 
