@@ -41,11 +41,15 @@ func NewFormat(formatting string) *Format {
 // SetPlaceholder sets specified placeholder with specified placeholder name
 // for given format.
 func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
+	format.Reset()
+
 	format.placeholders[name] = placeholder
 }
 
 // SetPlaceholders sets specified placeholders for given format.
 func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
+	format.Reset()
+
 	format.placeholders = map[string]Placeholder{}
 
 	for placeholderName, placeholder := range placeholders {
