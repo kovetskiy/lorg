@@ -12,69 +12,74 @@ import (
 )
 
 func TestPlaceholderLevel_ReturnsLevelStringRepresentation(t *testing.T) {
-	assert.Equal(t, "DEBUG", PlaceholderLevel(LevelDebug, "blah"))
-	assert.Equal(t, "FATAL", PlaceholderLevel(LevelFatal, "blah"))
-	assert.Equal(t, "FATAL", PlaceholderLevel(LevelFatal, ""))
+	test := assert.New(t)
+
+	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "blah"))
+	test.Equal("FATAL", PlaceholderLevel(LevelFatal, "blah"))
+	test.Equal("FATAL", PlaceholderLevel(LevelFatal, ""))
 }
 
 func TestPlaceholderLine_ReturnsCallerLine(t *testing.T) {
+	test := assert.New(t)
+
 	_, _, line, _ := runtime.Caller(0)
-	assert.Equal( // +1
-		t, // +2
-		strconv.Itoa(line+4),                                             // +3
-		callPlaceholderAtDeepStackLevel(PlaceholderLine, LevelDebug, ""), // +4
-	) // +5
-	assert.Equal( // +6
-		t, // +7
-		strconv.Itoa(line+9),                                               // +8
-		callPlaceholderAtDeepStackLevel(PlaceholderLine, LevelWarning, ""), // +9
+	test.Equal( // +1
+		strconv.Itoa(line+3),                                  // +2
+		fakePlaceholderStack(PlaceholderLine, LevelDebug, ""), // +3
+	) // +4
+	test.Equal( // +5
+		strconv.Itoa(line+7),                                    // +6
+		fakePlaceholderStack(PlaceholderLine, LevelWarning, ""), // +7
 	)
 }
 
 func TestPlaceholderFile_ReturnsCallerFilenameInShortModeByDefault(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	_, file, _, _ := runtime.Caller(0)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		filepath.Base(file),
-		callPlaceholderAtDeepStackLevel(PlaceholderFile, LevelInfo, ""),
+		fakePlaceholderStack(PlaceholderFile, LevelInfo, ""),
 	)
 }
 
 func TestPlaceholderFile_ReturnsCallerFilenameInShortModeIfValueIsShort(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	_, file, _, _ := runtime.Caller(0)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		filepath.Base(file),
-		callPlaceholderAtDeepStackLevel(PlaceholderFile, LevelDebug, "short"),
+		fakePlaceholderStack(PlaceholderFile, LevelDebug, "short"),
 	)
 }
 
 func TestPlaceholderFile_ReturnsCallerFullFilenameInLongMode(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	_, file, _, _ := runtime.Caller(0)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		file,
-		callPlaceholderAtDeepStackLevel(PlaceholderFile, LevelDebug, "long"),
+		fakePlaceholderStack(PlaceholderFile, LevelDebug, "long"),
 	)
-	assert.Equal(
-		t,
+	test.Equal(
 		file,
-		callPlaceholderAtDeepStackLevel(PlaceholderFile, LevelWarning, "long"),
+		fakePlaceholderStack(PlaceholderFile, LevelWarning, "long"),
 	)
 }
 
 func TestPlaceholderTime_ReturnsTimestampIfValueIsTimestamp(t *testing.T) {
-	assert.Equal(
-		t,
+	test := assert.New(t)
+
+	test.Equal(
 		fmt.Sprint(time.Now().Unix()),
 		PlaceholderTime(LevelDebug, "timestamp"),
 	)
@@ -83,16 +88,18 @@ func TestPlaceholderTime_ReturnsTimestampIfValueIsTimestamp(t *testing.T) {
 func TestPlaceholderTime_ReturnsTimeUsingDefaultLayoutIfValueNotSpecified(
 	t *testing.T,
 ) {
-	assert.Equal(
-		t,
+	test := assert.New(t)
+
+	test.Equal(
 		time.Now().Format(PlaceholderTimeDefaultLayout),
 		PlaceholderTime(LevelDebug, ""),
 	)
 }
 
 func TestPlaceholderTime_ReturnsTimeUsingSpecifiedLayout(t *testing.T) {
-	assert.Equal(
-		t,
+	test := assert.New(t)
+
+	test.Equal(
 		time.Now().Format(time.Kitchen),
 		PlaceholderTime(LevelDebug, time.Kitchen),
 	)
@@ -112,7 +119,7 @@ func TestPlaceholderTime_ReturnsTimeUsingSpecifiedLayout(t *testing.T) {
 //
 // Actually, this function is 2nd level of stack trace to call placeholder
 // 1st level of stack trace is testcase
-func callPlaceholderAtDeepStackLevel(
+func fakePlaceholderStack(
 	placeholder Placeholder, logLevel Level, placeholderValue string,
 ) string {
 	actualStackLevel := 2

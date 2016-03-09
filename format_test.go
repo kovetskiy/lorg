@@ -24,9 +24,11 @@ func (fabric *placeholderFabric) fabricate(name string) Placeholder {
 }
 
 func TestNewFormat_ReturnsFormatWithDefaultFiends(t *testing.T) {
+	test := assert.New(t)
+
 	format := NewFormat(``)
 
-	assert.Len(t, format.placeholders, len(defaultPlaceholders))
+	test.Len(format.placeholders, len(defaultPlaceholders))
 
 	keys := []string{}
 	for key := range defaultPlaceholders {
@@ -34,15 +36,19 @@ func TestNewFormat_ReturnsFormatWithDefaultFiends(t *testing.T) {
 	}
 
 	for _, key := range keys {
-		assert.Contains(t, format.placeholders, key)
+		test.Contains(format.placeholders, key)
 	}
 }
 
 func TestFormat_ImplementsFormatterInterface(t *testing.T) {
-	assert.Implements(t, (*Formatter)(nil), &Format{})
+	test := assert.New(t)
+
+	test.Implements((*Formatter)(nil), &Format{})
 }
 
 func TestFormat_GetPlaceholders_ReturnsPlaceholdersField(t *testing.T) {
+	test := assert.New(t)
+
 	rawFormat := `${place_foo} ${place_bar:arg} ${unknown}`
 	format := NewFormat(rawFormat)
 
@@ -53,10 +59,12 @@ func TestFormat_GetPlaceholders_ReturnsPlaceholdersField(t *testing.T) {
 
 	format.placeholders = placeholders
 
-	assert.Equal(t, placeholders, format.GetPlaceholders())
+	test.Equal(placeholders, format.GetPlaceholders())
 }
 
 func TestFormat_SetPlaceholders_ChangesPlaceholdersField(t *testing.T) {
+	test := assert.New(t)
+
 	// https://golang.org/doc/devel/weekly.html#2011-11-18
 	//
 	// Map and function value comparisons are now disallowed (except for
@@ -74,18 +82,20 @@ func TestFormat_SetPlaceholders_ChangesPlaceholdersField(t *testing.T) {
 	}
 
 	format.SetPlaceholders(placeholders)
-	assert.Contains(t, format.placeholders, "place_foo")
+	test.Contains(format.placeholders, "place_foo")
 
 	anotherPlaceholders := map[string]Placeholder{
 		"place_bar": func(_ Level, _ string) string { return "bar" },
 	}
 
 	format.SetPlaceholders(anotherPlaceholders)
-	assert.NotContains(t, format.placeholders, "place_foo")
-	assert.Contains(t, format.placeholders, "place_bar")
+	test.NotContains(format.placeholders, "place_foo")
+	test.Contains(format.placeholders, "place_bar")
 }
 
 func TestFormat_SetPlaceholder_ChangesPlaceholdersField(t *testing.T) {
+	test := assert.New(t)
+
 	// please see comment about testing SetPlaceholders function:
 	// TestFormat_SetPlaceholders_ChangesPlaceholdersField
 	format := NewFormat(``)
@@ -95,19 +105,21 @@ func TestFormat_SetPlaceholder_ChangesPlaceholdersField(t *testing.T) {
 
 	format.SetPlaceholder("place_foo", placeholderFoo)
 
-	assert.Len(t, format.placeholders, len(defaultPlaceholders)+1)
-	assert.Contains(t, format.placeholders, "place_foo")
+	test.Len(format.placeholders, len(defaultPlaceholders)+1)
+	test.Contains(format.placeholders, "place_foo")
 
 	format.SetPlaceholder("place_bar", placeholderBar)
 
-	assert.Len(t, format.placeholders, len(defaultPlaceholders)+2)
-	assert.Contains(t, format.placeholders, "place_foo")
-	assert.Contains(t, format.placeholders, "place_bar")
+	test.Len(format.placeholders, len(defaultPlaceholders)+2)
+	test.Contains(format.placeholders, "place_foo")
+	test.Contains(format.placeholders, "place_bar")
 }
 
 func TestFormat_Render_UsesPlaceholdersFieldForMatchingPlaceholders(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	rawFormat := `plain text ${place_foo} foo ${place_bar:barvalue}`
 	format := NewFormat(rawFormat)
 
@@ -118,8 +130,7 @@ func TestFormat_Render_UsesPlaceholdersFieldForMatchingPlaceholders(
 	format.SetPlaceholders(placeholders)
 	format.Render(LevelWarning)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		[]string{`${place_foo}`},
 		getReplacementsValues(format.replacements),
 	)
@@ -135,14 +146,15 @@ func TestFormat_Render_UsesPlaceholdersFieldForMatchingPlaceholders(
 
 	format.Render(LevelWarning)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		[]string{`${place_foo}`, `${place_bar:barvalue}`},
 		getReplacementsValues(format.replacements),
 	)
 }
 
 func TestFormat_Render_PlaceholderRegexpMatching(t *testing.T) {
+	test := assert.New(t)
+
 	type testcase struct {
 		format               string
 		expectedReplacements []string
@@ -255,8 +267,7 @@ func TestFormat_Render_PlaceholderRegexpMatching(t *testing.T) {
 		format.SetPlaceholders(placeholders)
 		format.Render(LevelError)
 
-		assert.Equal(
-			t,
+		test.Equal(
 			testcase.expectedReplacements,
 			getReplacementsValues(format.replacements),
 			"format: %s", testcase.format,
@@ -267,6 +278,8 @@ func TestFormat_Render_PlaceholderRegexpMatching(t *testing.T) {
 func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	rawFormat := `plain text ${place_foo} foo ${place_bar:barvalue}`
 	format := NewFormat(rawFormat)
 
@@ -278,16 +291,18 @@ func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
 
 	format.Render(LevelWarning)
 
-	assert.NotEmpty(t, format.replacements)
-	assert.True(t, format.compiled)
+	test.NotEmpty(format.replacements)
+	test.True(format.compiled)
 
 	format.Reset()
 
-	assert.Empty(t, format.replacements)
-	assert.False(t, format.compiled)
+	test.Empty(format.replacements)
+	test.False(format.compiled)
 }
 
 func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
+	test := assert.New(t)
+
 	fabric := new(placeholderFabric)
 
 	format := NewFormat(
@@ -303,8 +318,7 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 
 	rendered := format.Render(LevelWarning)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		"fmt: [place_foo@] [place_foo@1] [place_bar@a b c:d e f]",
 		rendered,
 	)
@@ -315,8 +329,8 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 		"[place_bar@a b c:d e f]",
 	}
 
-	assert.Equal(
-		t, expectedFabricLog, fabric.log,
+	test.Equal(
+		expectedFabricLog, fabric.log,
 		"Format runs placeholders in wrong order",
 	)
 
@@ -327,8 +341,7 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 
 	rendered = format.Render(LevelWarning)
 
-	assert.Equal(
-		t,
+	test.Equal(
 		"fmt: [place_foo@] [place_foo@1] [fakebar@a b c:d e f]",
 		rendered,
 	)
@@ -340,13 +353,15 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 		"[fakebar@a b c:d e f]",
 	)
 
-	assert.Equal(
-		t, expectedFabricLog, fabric.log,
+	test.Equal(
+		expectedFabricLog, fabric.log,
 		"Format runs placeholders in wrong order",
 	)
 }
 
 func TestFormat_Render_CallsSettedPlaceholdersAndPassesLogLevel(t *testing.T) {
+	test := assert.New(t)
+
 	format := NewFormat(`${place_foo}`)
 
 	var placeholderLogLevel Level = -1
@@ -361,8 +376,8 @@ func TestFormat_Render_CallsSettedPlaceholdersAndPassesLogLevel(t *testing.T) {
 
 	format.Render(LevelDebug)
 
-	assert.Equal(
-		t, LevelDebug, placeholderLogLevel,
+	test.Equal(
+		LevelDebug, placeholderLogLevel,
 		"log level doesn't passed to placeholder",
 	)
 }

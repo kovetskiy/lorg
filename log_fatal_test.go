@@ -12,6 +12,8 @@ import (
 )
 
 func TestLog_Fatal_ExitWithCode1(t *testing.T) {
+	test := assert.New(t)
+
 	testcaseEnv := os.Getenv("TESTCASE")
 
 	switch testcaseEnv {
@@ -21,7 +23,7 @@ func TestLog_Fatal_ExitWithCode1(t *testing.T) {
 
 		log.Fatal("TESTCASE: ", testcaseEnv)
 
-		assert.Fail(t, "Fatal does not exit program")
+		test.Fail("Fatal does not exit program")
 
 		return
 
@@ -31,7 +33,7 @@ func TestLog_Fatal_ExitWithCode1(t *testing.T) {
 
 		log.Fatalf("TESTCASE: %s", testcaseEnv)
 
-		assert.Fail(t, "Fatalf does not exit program")
+		test.Fail("Fatalf does not exit program")
 
 		return
 	}
@@ -46,11 +48,11 @@ func TestLog_Fatal_ExitWithCode1(t *testing.T) {
 			testcase,
 		)
 		if err != nil {
-			assert.FailNow(t, "%s testcase failed: %s", testcase, err)
+			test.FailNow("%s testcase failed: %s", testcase, err)
 		}
 
-		assert.Equal(t, 1, status)
-		assert.Equal(t, "[testcase] TESTCASE: "+testcase+"\n", output)
+		test.Equal(1, status)
+		test.Equal("[testcase] TESTCASE: "+testcase+"\n", output)
 	}
 }
 

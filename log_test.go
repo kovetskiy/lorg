@@ -33,52 +33,64 @@ func (mock *mockFormat) Render(logLevel Level) string {
 func (mock *mockFormat) Reset() {}
 
 func TestNewLog_ReturnsLogWithDefaultFields(t *testing.T) {
+	test := assert.New(t)
+
 	log := NewLog()
 
-	assert.Equal(
-		t, defaultLevel, log.level,
+	test.Equal(
+		defaultLevel, log.level,
 		"Log object created with wrong default logging level",
 	)
 
-	assert.Equal(
-		t, defaultFormat, log.format,
+	test.Equal(
+		defaultFormat, log.format,
 		"Log object created with wrong default logging format",
 	)
 
-	assert.Equal(
-		t, defaultOutput, log.output,
+	test.Equal(
+		defaultOutput, log.output,
 		"Log object created with wrong default logging output",
 	)
 }
 
 func TestLog_ImplementsLoggerInterface(t *testing.T) {
-	assert.Implements(t, (*Logger)(nil), &Log{})
+	test := assert.New(t)
+
+	test.Implements((*Logger)(nil), &Log{})
 }
 
 func TestLog_SetFormat_ChangesFormatField(t *testing.T) {
+	test := assert.New(t)
+
 	mock := new(mockFormat)
 
 	log := NewLog()
 	log.SetFormat(mock)
 
-	assert.Equal(t, mock, log.format)
+	test.Equal(mock, log.format)
 }
 
 func TestLog_SetLevel_ChangesLevelField(t *testing.T) {
+	test := assert.New(t)
+
 	log := NewLog()
 	log.SetLevel(LevelWarning)
 
-	assert.Equal(t, LevelWarning, log.level)
+	test.Equal(LevelWarning, log.level)
 }
 
 func TestLog_SetOutput_ChangesOutputField(t *testing.T) {
+	test := assert.New(t)
+
 	log := NewLog()
 	log.SetOutput(ioutil.Discard)
 
-	assert.Equal(t, ioutil.Discard, log.output)
+	test.Equal(ioutil.Discard, log.output)
 }
 
 func TestLog_LoggingFunctions_CallsFormatRender(t *testing.T) {
+	test := assert.New(t)
+
 	mock := new(mockFormat)
 
 	log := NewLog()
@@ -86,7 +98,7 @@ func TestLog_LoggingFunctions_CallsFormatRender(t *testing.T) {
 
 	log.Print(getFilenameAndLine())
 
-	assert.Equal(t, 1, mock.callsRender)
+	test.Equal(1, mock.callsRender)
 
 	log.Printf(getFilenameAndLine())
 	log.Error(getFilenameAndLine())
@@ -96,19 +108,21 @@ func TestLog_LoggingFunctions_CallsFormatRender(t *testing.T) {
 	log.Info(getFilenameAndLine())
 	log.Infof(getFilenameAndLine())
 
-	assert.Equal(t, 8, mock.callsRender)
+	test.Equal(8, mock.callsRender)
 
 	log.SetLevel(LevelDebug)
 
 	log.Debug(getFilenameAndLine())
 	log.Debugf(getFilenameAndLine())
 
-	assert.Equal(t, 10, mock.callsRender)
+	test.Equal(10, mock.callsRender)
 }
 
 func TestLog_LoggingFunctions_LogsRecordsWithSameLevelOrAbove(
 	t *testing.T,
 ) {
+	test := assert.New(t)
+
 	log := NewLog()
 
 	// Fatal tested in special function
@@ -143,8 +157,8 @@ func TestLog_LoggingFunctions_LogsRecordsWithSameLevelOrAbove(
 			)
 		}
 
-		assert.Equal(
-			t, (index+1)*2, mock.callsRender,
+		test.Equal(
+			(index+1)*2, mock.callsRender,
 			"level: %s", setting.level,
 		)
 	}
