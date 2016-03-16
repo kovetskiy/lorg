@@ -275,31 +275,6 @@ func TestFormat_Render_PlaceholderRegexpMatching(t *testing.T) {
 	}
 }
 
-func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
-	t *testing.T,
-) {
-	test := assert.New(t)
-
-	rawFormat := `plain text ${place_foo} foo ${place_bar:barvalue}`
-	format := NewFormat(rawFormat)
-
-	format.SetPlaceholders(
-		map[string]Placeholder{
-			"place_foo": func(_ Level, _ string) string { return "foo" },
-		},
-	)
-
-	format.Render(LevelWarning)
-
-	test.NotEmpty(format.replacements)
-	test.True(format.compiled)
-
-	format.Reset()
-
-	test.Empty(format.replacements)
-	test.False(format.compiled)
-}
-
 func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 	test := assert.New(t)
 
@@ -380,4 +355,29 @@ func TestFormat_Render_CallsSettedPlaceholdersAndPassesLogLevel(t *testing.T) {
 		LevelDebug, placeholderLogLevel,
 		"log level doesn't passed to placeholder",
 	)
+}
+
+func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
+	t *testing.T,
+) {
+	test := assert.New(t)
+
+	rawFormat := `plain text ${place_foo} foo ${place_bar:barvalue}`
+	format := NewFormat(rawFormat)
+
+	format.SetPlaceholders(
+		map[string]Placeholder{
+			"place_foo": func(_ Level, _ string) string { return "foo" },
+		},
+	)
+
+	format.Render(LevelWarning)
+
+	test.NotEmpty(format.replacements)
+	test.True(format.compiled)
+
+	format.Reset()
+
+	test.Empty(format.replacements)
+	test.False(format.compiled)
 }
