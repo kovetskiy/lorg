@@ -1,10 +1,17 @@
 package lorg
 
-// Discarder implements Logger interface but with one important difference,
-// Discarder actually do nothing and doesn't log anything.
-// It can be useful in packages, which want to have a opportunity to log debug
-// messages, see details in documentation to Logger interface.
-var Discarder Logger = new(discarder)
+// NewDiscarder returns new Discarder instance which implements Logger
+// interface but have one important feature, Discarder actually do nothing and
+// doesn't log anything.
+//
+// It's very useful in packages, which want to have a opportunity to log debug
+// messages, but by default should not log anything.
+func NewDiscarder() Logger {
+	return new(discarder)
+}
+
+// ensure that discarder implements Logger interface.
+var _ Logger = (*discarder)(nil)
 
 type discarder struct{}
 
