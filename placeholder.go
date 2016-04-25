@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -50,8 +51,32 @@ const (
 // PlaceholderLevel returns level of current logging record.
 //
 // Using: ${level}
-func PlaceholderLevel(logLevel Level, _ string) string {
-	return logLevel.String()
+func PlaceholderLevel(logLevel Level, optional string) string {
+	var (
+		format = "%s"
+		align  = false
+	)
+
+	options := strings.SplitN(optional, ":", 2)
+	if options[0] != "" {
+		format = options[0]
+	}
+
+	if len(options) >= 2 && (options[1] == "true" || options[1] == "1") {
+		align = true
+	}
+
+	const maxLevelStringLength = 7
+
+	value := fmt.Sprintf(format, logLevel.String())
+	if align {
+		alignment := maxLevelStringLength - len(logLevel.String())
+		if alignment > 0 {
+			value += strings.Repeat(" ", alignment)
+		}
+	}
+
+	return value
 }
 
 // PlaceholderLine returns a file line where has been called logging function.

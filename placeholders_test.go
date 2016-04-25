@@ -14,9 +14,22 @@ import (
 func TestPlaceholderLevel_ReturnsLevelStringRepresentation(t *testing.T) {
 	test := assert.New(t)
 
-	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "blah"))
-	test.Equal("FATAL", PlaceholderLevel(LevelFatal, "blah"))
+	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, ""))
 	test.Equal("FATAL", PlaceholderLevel(LevelFatal, ""))
+}
+
+func TestPlaceholderLevel_UsesSpecifiedFormat(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "%s"))
+	test.Equal("[FATAL]", PlaceholderLevel(LevelFatal, "[%s]"))
+}
+
+func TestPlaceholderLevel_AlignString(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("[DEBUG]  ", PlaceholderLevel(LevelDebug, "[%s]:true"))
+	test.Equal("[WARNING]", PlaceholderLevel(LevelWarning, "[%s]:true"))
 }
 
 func TestPlaceholderLine_ReturnsCallerLine(t *testing.T) {
