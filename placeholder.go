@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/zazab/zhash"
 )
 
 // Placeholder is function which will be called by Formatter for all parsed
@@ -33,6 +35,8 @@ var (
 		"file":  PlaceholderFile,
 		"time":  PlaceholderTime,
 	}
+
+	cache = zhash.NewHash()
 )
 
 const (
@@ -52,6 +56,15 @@ const (
 //
 // Using: ${level}
 func PlaceholderLevel(logLevel Level, optional string) string {
+	path := []string{
+		"placeholders", "level", logLevel.String(), optional,
+	}
+
+	cached, err := cache.GetString(path...)
+	if err == nil {
+		return cached
+	}
+
 	const (
 		maxLevelStringLength      = 7
 		maxLevelStringLengthShort = 5
@@ -64,25 +77,19 @@ func PlaceholderLevel(logLevel Level, optional string) string {
 		short     = false
 	)
 
-	options := strings.SplitN(optional, ":", 3)
+	options := options(optional, 3)
 
-	if len(options) > 0 {
-		if options[0] != "" {
-			format = options[0]
-		}
+	if options[0] != "" {
+		format = options[0]
 	}
 
-	if len(options) > 1 {
-		if options[1] == "left" || options[1] == "right" {
-			alignment = options[1]
-			align = true
-		}
+	if options[1] == "left" || options[1] == "right" {
+		alignment = options[1]
+		align = true
 	}
 
-	if len(options) > 2 {
-		if isTrueString(options[2]) {
-			short = true
-		}
+	if isTrueString(options[2]) {
+		short = true
 	}
 
 	var levelString string
@@ -109,6 +116,8 @@ func PlaceholderLevel(logLevel Level, optional string) string {
 			value = strings.Repeat(" ", shift) + value
 		}
 	}
+
+	cache.Set(value, path...)
 
 	return value
 }
@@ -169,4 +178,27 @@ func PlaceholderTime(logLevel Level, layout string) string {
 
 func isTrueString(str string) bool {
 	return str == "true" || str == "yes" || str == "1"
+}
+
+func options(str string, count int) []string {
+	cached, err := cache.GetStringSlice("options", str, strconv.Itoa(count))
+	if err == nil {
+		return cached
+	}
+
+	options := strings.SplitN(
+		strings.Replace(str, `\:`, "\x00", -1), ":", count,
+	)
+
+	for index, option := range options {
+		options[index] = strings.Replace(option, "\x00", ":", -1)
+	}
+
+	for len(options) < count {
+		options = append(options, "")
+	}
+
+	cache.Set(options, "options", str, strconv.Itoa(count))
+
+	return options
 }
