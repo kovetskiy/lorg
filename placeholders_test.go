@@ -11,25 +11,79 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPlaceholderLevel_ReturnsLevelStringRepresentation(t *testing.T) {
+func TestPlaceholderLevel_ReturnsLevelWithoutOptions(t *testing.T) {
 	test := assert.New(t)
 
 	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, ""))
 	test.Equal("FATAL", PlaceholderLevel(LevelFatal, ""))
 }
 
-func TestPlaceholderLevel_UsesSpecifiedFormat(t *testing.T) {
+func TestPlaceholderLevel_ReturnsFormattedLevel(t *testing.T) {
 	test := assert.New(t)
 
 	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "%s"))
 	test.Equal("[FATAL]", PlaceholderLevel(LevelFatal, "[%s]"))
+	test.Equal("xxx INFO xxx", PlaceholderLevel(LevelInfo, "xxx %s xxx"))
 }
 
-func TestPlaceholderLevel_AlignString(t *testing.T) {
+func TestPlaceholderLevel_ReturnsLevelAlignedLeft(t *testing.T) {
 	test := assert.New(t)
 
-	test.Equal("[DEBUG]  ", PlaceholderLevel(LevelDebug, "[%s]:true"))
-	test.Equal("[WARNING]", PlaceholderLevel(LevelWarning, "[%s]:true"))
+	test.Equal("DEBUG  ", PlaceholderLevel(LevelDebug, "%s:left"))
+	test.Equal("WARNING", PlaceholderLevel(LevelWarning, "%s:left"))
+}
+
+func TestPlaceholderLevel_ReturnsLevelAlignedRight(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("  DEBUG", PlaceholderLevel(LevelDebug, "%s:right"))
+	test.Equal("WARNING", PlaceholderLevel(LevelWarning, "%s:right"))
+}
+
+func TestPlaceholderLevel_ReturnsFormattedLevelAlignedLeft(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("[DEBUG]  ", PlaceholderLevel(LevelDebug, "[%s]:left"))
+	test.Equal("[WARNING]", PlaceholderLevel(LevelWarning, "[%s]:left"))
+}
+
+func TestPlaceholderLevel_ReturnsFormattedLevelAlignedRight(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("  [DEBUG]", PlaceholderLevel(LevelDebug, "[%s]:right"))
+	test.Equal("[WARNING]", PlaceholderLevel(LevelWarning, "[%s]:right"))
+}
+
+func TestPlaceholderLevel_ReturnsLevelAlignedLeftShortString(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "%s:left:true"))
+	test.Equal("WARN ", PlaceholderLevel(LevelWarning, "%s:left:true"))
+}
+
+func TestPlaceholderLevel_ReturnsLevelAlignedRightShortString(t *testing.T) {
+	test := assert.New(t)
+
+	test.Equal("DEBUG", PlaceholderLevel(LevelDebug, "%s:right:true"))
+	test.Equal(" WARN", PlaceholderLevel(LevelWarning, "%s:right:true"))
+}
+
+func TestPlaceholderLevel_ReturnsFormattedLevelAlignedLeftShortString(
+	t *testing.T,
+) {
+	test := assert.New(t)
+
+	test.Equal("[DEBUG]", PlaceholderLevel(LevelDebug, "[%s]:left:true"))
+	test.Equal("[WARN] ", PlaceholderLevel(LevelWarning, "[%s]:left:true"))
+}
+
+func TestPlaceholderLevel_ReturnsFormattedLevelAlignedRightShortString(
+	t *testing.T,
+) {
+	test := assert.New(t)
+
+	test.Equal("[DEBUG]", PlaceholderLevel(LevelDebug, "[%s]:right:true"))
+	test.Equal(" [WARN]", PlaceholderLevel(LevelWarning, "[%s]:right:true"))
 }
 
 func TestPlaceholderLine_ReturnsCallerLine(t *testing.T) {

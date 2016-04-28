@@ -52,27 +52,61 @@ const (
 //
 // Using: ${level}
 func PlaceholderLevel(logLevel Level, optional string) string {
-	var (
-		format = "%s"
-		align  = false
+	const (
+		maxLevelStringLength      = 7
+		maxLevelStringLengthShort = 5
 	)
 
-	options := strings.SplitN(optional, ":", 2)
-	if options[0] != "" {
-		format = options[0]
+	var (
+		format    = "%s"
+		align     = false
+		alignment = "left"
+		short     = false
+	)
+
+	options := strings.SplitN(optional, ":", 3)
+
+	if len(options) > 0 {
+		if options[0] != "" {
+			format = options[0]
+		}
 	}
 
-	if len(options) >= 2 && (options[1] == "true" || options[1] == "1") {
-		align = true
+	if len(options) > 1 {
+		if options[1] == "left" || options[1] == "right" {
+			alignment = options[1]
+			align = true
+		}
 	}
 
-	const maxLevelStringLength = 7
+	if len(options) > 2 {
+		if isTrueString(options[2]) {
+			short = true
+		}
+	}
 
-	value := fmt.Sprintf(format, logLevel.String())
+	var levelString string
+	if short {
+		levelString = logLevel.StringShort()
+	} else {
+		levelString = logLevel.String()
+	}
+
+	value := fmt.Sprintf(format, levelString)
+
 	if align {
-		alignment := maxLevelStringLength - len(logLevel.String())
-		if alignment > 0 {
-			value += strings.Repeat(" ", alignment)
+		var shift int
+		if short {
+			shift = maxLevelStringLengthShort - len(levelString)
+		} else {
+			shift = maxLevelStringLength - len(levelString)
+		}
+
+		switch alignment {
+		case "left":
+			value = value + strings.Repeat(" ", shift)
+		case "right":
+			value = strings.Repeat(" ", shift) + value
 		}
 	}
 
@@ -131,4 +165,8 @@ func PlaceholderTime(logLevel Level, layout string) string {
 	}
 
 	return time.Now().Format(layout)
+}
+
+func isTrueString(str string) bool {
+	return str == "true" || str == "yes" || str == "1"
 }

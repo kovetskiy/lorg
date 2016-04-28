@@ -37,3 +37,13 @@ func (level Level) String() string {
 
 	return "UNKNOWN"
 }
+
+// String returns the short string representation of a given logging level.
+func (level Level) StringShort() string {
+	switch level {
+	case LevelWarning:
+		return "WARN"
+	}
+
+	return level.String()
+}
