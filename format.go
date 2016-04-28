@@ -1,5 +1,6 @@
 package lorg
 
+import "github.com/zazab/zhash"
 import "strings"
 
 // Format is the actual Formatter which used by Log structure for formatting
@@ -66,6 +67,7 @@ func (format *Format) GetPlaceholders() map[string]Placeholder {
 func (format *Format) Reset() {
 	format.replacements = []replacement{}
 	format.compiled = false
+	cache = zhash.NewHash()
 }
 
 // Render generates string which will be used by Log instance.
