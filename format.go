@@ -1,7 +1,11 @@
 package lorg
 
-import "github.com/zazab/zhash"
-import "strings"
+import (
+	"strings"
+	"sync"
+
+	"github.com/zazab/zhash"
+)
 
 // Format is the actual Formatter which used by Log structure for formatting
 // log records before writing log records into Log.output.
@@ -12,6 +16,7 @@ type Format struct {
 	compiled     bool
 	replacements []replacement
 	placeholders map[string]Placeholder
+	mutex        *sync.RWMutex
 }
 
 type replacement struct {
@@ -29,6 +34,7 @@ type replacement struct {
 func NewFormat(formatting string) *Format {
 	format := &Format{
 		formatting: formatting,
+		mutex:      &sync.RWMutex{},
 	}
 
 	// we are should not assing format.placeholders to defaultPlaceholders
@@ -44,6 +50,9 @@ func NewFormat(formatting string) *Format {
 func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 	format.Reset()
 
+	format.mutex.Lock()
+	defer format.mutex.Unlock()
+
 	format.placeholders[name] = placeholder
 }
 
@@ -51,8 +60,10 @@ func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
 	format.Reset()
 
-	format.placeholders = map[string]Placeholder{}
+	format.mutex.Lock()
+	defer format.mutex.Unlock()
 
+	format.placeholders = map[string]Placeholder{}
 	for placeholderName, placeholder := range placeholders {
 		format.placeholders[placeholderName] = placeholder
 	}
@@ -65,6 +76,9 @@ func (format *Format) GetPlaceholders() map[string]Placeholder {
 
 // Reset resets state of given format.
 func (format *Format) Reset() {
+	format.mutex.Lock()
+	defer format.mutex.Unlock()
+
 	format.replacements = []replacement{}
 	format.compiled = false
 	cache = zhash.NewHash()
@@ -80,10 +94,17 @@ func (format *Format) Render(logLevel Level) string {
 
 	rendered := format.formatting
 	for _, replacement := range format.replacements {
-		placeholderValue := replacement.placeholder(
-			logLevel,
-			replacement.placeholderValue,
-		)
+		var placeholderValue string
+
+		func() {
+			format.mutex.RLock()
+			defer format.mutex.RUnlock()
+
+			placeholderValue = replacement.placeholder(
+				logLevel,
+				replacement.placeholderValue,
+			)
+		}()
 
 		rendered = strings.Replace(
 			rendered, replacement.value, placeholderValue, 1,
@@ -105,7 +126,16 @@ func (format *Format) compile() {
 			placeholderValue = match[3]
 		)
 
-		placeholder, ok := format.placeholders[placeholderName]
+		var placeholder Placeholder
+		var ok bool
+
+		func() {
+			format.mutex.RLock()
+			defer format.mutex.RUnlock()
+
+			placeholder, ok = format.placeholders[placeholderName]
+		}()
+
 		if !ok {
 			// placeholder with specified name not found
 			continue

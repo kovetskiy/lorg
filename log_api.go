@@ -3,6 +3,7 @@ package lorg
 import (
 	"io"
 	"os"
+	"sync"
 )
 
 const (
@@ -31,6 +32,7 @@ type Log struct {
 	level  Level
 	output io.Writer
 	format Formatter
+	mutex  *sync.Mutex
 }
 
 // NewLog creates a new Log instance with default configuration:
@@ -46,6 +48,7 @@ func NewLog() *Log {
 		level:  defaultLevel,
 		format: defaultFormat,
 		output: defaultOutput,
+		mutex:  &sync.Mutex{},
 	}
 
 	return log
@@ -123,12 +126,12 @@ func (log *Log) Warningf(format string, value ...interface{}) {
 
 // Print is pseudonym for Info
 func (log *Log) Print(value ...interface{}) {
-	log.Info(value...)
+	log.log(LevelInfo, value...)
 }
 
 // Printf is pseudonym for Infof
 func (log *Log) Printf(format string, value ...interface{}) {
-	log.Infof(format, value...)
+	log.logf(LevelInfo, format, value...)
 }
 
 // Info logs record if given logger level is equal or above LevelInfo.
