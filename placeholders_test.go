@@ -1,10 +1,12 @@
 package lorg
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -91,12 +93,12 @@ func TestPlaceholderLine_ReturnsCallerLine(t *testing.T) {
 
 	_, _, line, _ := runtime.Caller(0)
 	test.Equal( // +1
-		strconv.Itoa(line+3),                                  // +2
-		fakePlaceholderStack(PlaceholderLine, LevelDebug, ""), // +3
+		strconv.Itoa(line+3),                        // +2
+		callLoggerWithFormat("${line}", LevelDebug), // +3
 	) // +4
 	test.Equal( // +5
-		strconv.Itoa(line+7),                                    // +6
-		fakePlaceholderStack(PlaceholderLine, LevelWarning, ""), // +7
+		strconv.Itoa(line+7),                          // +6
+		callLoggerWithFormat("${line}", LevelWarning), // +7
 	)
 }
 
@@ -109,7 +111,7 @@ func TestPlaceholderFile_ReturnsCallerFilenameInShortModeByDefault(
 
 	test.Equal(
 		filepath.Base(file),
-		fakePlaceholderStack(PlaceholderFile, LevelInfo, ""),
+		callLoggerWithFormat("${file}", LevelInfo),
 	)
 }
 
@@ -122,7 +124,7 @@ func TestPlaceholderFile_ReturnsCallerFilenameInShortModeIfValueIsShort(
 
 	test.Equal(
 		filepath.Base(file),
-		fakePlaceholderStack(PlaceholderFile, LevelDebug, "short"),
+		callLoggerWithFormat("${file:short}", LevelDebug),
 	)
 }
 
@@ -135,11 +137,11 @@ func TestPlaceholderFile_ReturnsCallerFullFilenameInLongMode(
 
 	test.Equal(
 		file,
-		fakePlaceholderStack(PlaceholderFile, LevelDebug, "long"),
+		callLoggerWithFormat("${file:long}", LevelDebug),
 	)
 	test.Equal(
 		file,
-		fakePlaceholderStack(PlaceholderFile, LevelWarning, "long"),
+		callLoggerWithFormat("${file:long}", LevelWarning),
 	)
 }
 
@@ -176,39 +178,32 @@ func TestPlaceholderTime_ReturnsTimeUsingSpecifiedLayout(t *testing.T) {
 // should be tested using this helper because Placeholder function will be
 // executed by Formatter at N level of stack trace below than calling some log
 // function.
-//
-// For example:
-// 1 level: github.com/user/project: call Log.Warning
-// 2 level: lorg: Log.Warning call log.log
-// 3 level: lorg: Log.log call Log.doLog
-// 4 level: lorg: log.doLog call Format.Render
-// 5 level: lorg: Format.Render call Placeholder
-//
-// Actually, this function is 2nd level of stack trace to call placeholder
-// 1st level of stack trace is testcase
-func fakePlaceholderStack(
-	placeholder Placeholder, logLevel Level, placeholderValue string,
+func callLoggerWithFormat(
+	format string, logLevel Level,
 ) string {
-	actualStackLevel := 2
+	placeholderCallStackLevel += 1
+	defer func() {
+		placeholderCallStackLevel = PlaceholderCallStackLevel
+	}()
 
-	return doRecursiveCallPlaceholder(
-		placeholder, logLevel, placeholderValue,
-		actualStackLevel, PlaceholderCallStackLevel,
-	)
-}
+	buffer := bytes.NewBuffer(nil)
+	logger := NewLog()
+	logger.SetOutput(buffer)
+	logger.SetFormat(NewFormat(format))
+	logger.SetLevel(LevelDebug)
 
-func doRecursiveCallPlaceholder(
-	placeholder Placeholder, logLevel Level, placeholderValue string,
-	actualStackLevel, expectedStackLevel int,
-) string {
-	actualStackLevel++
+	switch logLevel {
+	case LevelDebug:
+		logger.Debug("")
+	case LevelWarning:
+		logger.Warning("")
 
-	if actualStackLevel >= expectedStackLevel {
-		return placeholder(logLevel, placeholderValue)
+	case LevelInfo:
+		logger.Info("")
+
+	default:
+		panic("unexpected logging level: " + logLevel.String())
 	}
 
-	return doRecursiveCallPlaceholder(
-		placeholder, logLevel, placeholderValue,
-		actualStackLevel, expectedStackLevel,
-	)
+	return strings.TrimRight(string(buffer.Bytes()), "\n")
 }
