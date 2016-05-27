@@ -3,8 +3,6 @@ package lorg
 import (
 	"strings"
 	"sync"
-
-	"github.com/zazab/zhash"
 )
 
 // Format is the actual Formatter which used by Log structure for formatting
@@ -81,7 +79,7 @@ func (format *Format) Reset() {
 
 	format.replacements = []replacement{}
 	format.compiled = false
-	cache = zhash.NewHash()
+	cache.reset()
 }
 
 // Render generates string which will be used by Log instance.

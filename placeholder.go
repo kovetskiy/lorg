@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/zazab/zhash"
@@ -26,6 +27,11 @@ import (
 //     * ${level:a:b:c} - value will be "a:b:c"
 type Placeholder func(logLevel Level, value string) string
 
+type cacheHash struct {
+	hash zhash.Hash
+	*sync.RWMutex
+}
+
 var (
 	rePlaceholder = regexp.MustCompile(`\${(\w+)(:([^}]+))?}`)
 
@@ -36,7 +42,7 @@ var (
 		"time":  PlaceholderTime,
 	}
 
-	cache = zhash.NewHash()
+	cache = &cacheHash{zhash.NewHash(), &sync.RWMutex{}}
 )
 
 const (
@@ -65,9 +71,9 @@ func PlaceholderLevel(logLevel Level, optional string) string {
 		"placeholders", "level", logLevel.String(), optional,
 	}
 
-	cached, err := cache.GetString(path...)
-	if err == nil {
-		return cached
+	cachedValue := cache.getString(path...)
+	if cachedValue != "" {
+		return cachedValue
 	}
 
 	const (
@@ -122,7 +128,7 @@ func PlaceholderLevel(logLevel Level, optional string) string {
 		}
 	}
 
-	cache.Set(value, path...)
+	cache.set(value, path...)
 
 	return value
 }
@@ -186,9 +192,9 @@ func isTrueString(str string) bool {
 }
 
 func options(str string, count int) []string {
-	cached, err := cache.GetStringSlice("options", str, strconv.Itoa(count))
-	if err == nil {
-		return cached
+	cachedValue := cache.getStringSlice("options", str, strconv.Itoa(count))
+	if len(cachedValue) != 0 {
+		return cachedValue
 	}
 
 	options := strings.SplitN(
@@ -203,7 +209,33 @@ func options(str string, count int) []string {
 		options = append(options, "")
 	}
 
-	cache.Set(options, "options", str, strconv.Itoa(count))
+	cache.set(options, "options", str, strconv.Itoa(count))
 
 	return options
+}
+
+func (cache *cacheHash) reset() {
+	cache.Lock()
+	defer cache.Unlock()
+	cache.hash = zhash.NewHash()
+}
+
+func (cache *cacheHash) getString(path ...string) string {
+	cache.RLock()
+	defer cache.RUnlock()
+	value, _ := cache.hash.GetString(path...)
+	return value
+}
+
+func (cache *cacheHash) getStringSlice(path ...string) []string {
+	cache.RLock()
+	defer cache.RUnlock()
+	value, _ := cache.hash.GetStringSlice(path...)
+	return value
+}
+
+func (cache *cacheHash) set(value interface{}, path ...string) {
+	cache.Lock()
+	defer cache.Unlock()
+	cache.hash.Set(value, path...)
 }
