@@ -171,3 +171,15 @@ func (log *Log) Debug(value ...interface{}) {
 func (log *Log) Debugf(format string, value ...interface{}) {
 	log.logf(LevelDebug, format, value...)
 }
+
+// Trace logs record if given logger level is equal or above LevelTrace.
+// Arguments are handled in the manner of fmt.Print.
+func (log *Log) Trace(value ...interface{}) {
+	log.log(LevelTrace, value...)
+}
+
+// Tracef logs record if given logger level is equal or above LevelTrace.
+// Arguments are handled in the manner of fmt.Printf.
+func (log *Log) Tracef(format string, value ...interface{}) {
+	log.logf(LevelTrace, format, value...)
+}

@@ -27,3 +27,5 @@ func (*discarder) Info(_ ...interface{})               {}
 func (*discarder) Infof(_ string, _ ...interface{})    {}
 func (*discarder) Debug(_ ...interface{})              {}
 func (*discarder) Debugf(_ string, _ ...interface{})   {}
+func (*discarder) Trace(_ ...interface{})              {}
+func (*discarder) Tracef(_ string, _ ...interface{})   {}

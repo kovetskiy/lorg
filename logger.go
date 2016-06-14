@@ -36,4 +36,7 @@ type Logger interface {
 
 	Debug(values ...interface{})
 	Debugf(format string, values ...interface{})
+
+	Trace(values ...interface{})
+	Tracef(format string, values ...interface{})
 }

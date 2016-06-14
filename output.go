@@ -24,6 +24,7 @@ func NewOutput(stderr io.Writer) *output {
 			LevelWarning: []io.Writer{stderr},
 			LevelInfo:    []io.Writer{stderr},
 			LevelDebug:   []io.Writer{stderr},
+			LevelTrace:   []io.Writer{stderr},
 		},
 		mutex: &sync.Mutex{},
 	}

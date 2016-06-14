@@ -18,6 +18,9 @@ const (
 
 	// LevelDebug should be used for messages with DEBUG severity.
 	LevelDebug
+
+	// LevelTrace should be used for messages with TRACE severity.
+	LevelTrace
 )
 
 // String returns the string representation of a given logging level.
@@ -33,6 +36,8 @@ func (level Level) String() string {
 		return "INFO"
 	case LevelDebug:
 		return "DEBUG"
+	case LevelTrace:
+		return "TRACE"
 	}
 
 	return "UNKNOWN"
