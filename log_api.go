@@ -20,6 +20,9 @@ var (
 	defaultLevel  = LevelInfo
 	defaultFormat = NewFormat(DefaultFormatting)
 	defaultOutput = NewOutput(os.Stderr)
+
+	// Exiter will be called after Fatal/Fatalf invocation.
+	Exiter = os.Exit
 )
 
 // Log is the actual log which creates log records based on the functins called
@@ -103,7 +106,7 @@ func (log *Log) SetOutput(output io.Writer) {
 // Arguments are handled in the manner of fmt.Print.
 func (log *Log) Fatal(value ...interface{}) {
 	log.log(LevelFatal, value...)
-	os.Exit(1)
+	Exiter(1)
 }
 
 // Fatalf logs record if given logger level is equal or above LevelFatal, and
@@ -111,7 +114,7 @@ func (log *Log) Fatal(value ...interface{}) {
 // Arguments are handled in the manner of fmt.Print.
 func (log *Log) Fatalf(format string, value ...interface{}) {
 	log.logf(LevelFatal, format, value...)
-	os.Exit(1)
+	Exiter(1)
 }
 
 // Error logs record if given logger level is equal or above LevelError.
