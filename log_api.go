@@ -19,7 +19,7 @@ const (
 var (
 	defaultLevel  = LevelInfo
 	defaultFormat = NewFormat(DefaultFormatting)
-	defaultOutput = os.Stderr
+	defaultOutput = NewOutput(os.Stderr)
 )
 
 // Log is the actual log which creates log records based on the functins called
@@ -29,8 +29,9 @@ var (
 // because Log fields can be changed or added other fields, so it can provide
 // bugs in future.
 type Log struct {
-	level  Level
-	output io.Writer
+	level Level
+
+	output SmartOutput
 	format Formatter
 	mutex  *sync.Mutex
 }
@@ -61,6 +62,9 @@ func NewLog() *Log {
 // creates with INFO level, so levels above (warn, err, fatal, info) will be
 // logged also.
 func (log *Log) SetLevel(level Level) {
+	log.mutex.Lock()
+	defer log.mutex.Unlock()
+
 	log.level = level
 }
 
@@ -72,6 +76,9 @@ func (log *Log) SetLevel(level Level) {
 // placeholders.
 // See: DefaultFormatting
 func (log *Log) SetFormat(format Formatter) {
+	log.mutex.Lock()
+	defer log.mutex.Unlock()
+
 	log.format = format
 }
 
@@ -81,7 +88,14 @@ func (log *Log) SetFormat(format Formatter) {
 // Running SetOutput it's not required operation, by default Log instance
 // logs all records to stderr (os.Stderr)
 func (log *Log) SetOutput(output io.Writer) {
-	log.output = output
+	log.mutex.Lock()
+	defer log.mutex.Unlock()
+
+	if _, ok := output.(SmartOutput); !ok {
+		output = NewOutput(output)
+	}
+
+	log.output = output.(SmartOutput)
 }
 
 // Fatal logs record if given logger level is equal or above LevelFatal, and

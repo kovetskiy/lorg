@@ -85,7 +85,7 @@ func TestLog_SetOutput_ChangesOutputField(t *testing.T) {
 	log := NewLog()
 	log.SetOutput(ioutil.Discard)
 
-	test.Equal(ioutil.Discard, log.output)
+	test.Equal(ioutil.Discard, log.output.(*output).conditions[LevelDebug][0])
 }
 
 func TestLog_LoggingFunctions_CallsFormatRender(t *testing.T) {

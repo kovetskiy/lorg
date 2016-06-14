@@ -40,14 +40,14 @@ func (log *Log) doLog(level Level, value ...interface{}) {
 		log.mutex.Lock()
 		defer log.mutex.Unlock()
 
-		err := log.write(message)
+		err := log.write(message, level)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to write to log: %#v", err)
 		}
 	}()
 }
 
-func (log *Log) write(message string) error {
-	_, err := log.output.Write([]byte(message))
+func (log *Log) write(message string, level Level) error {
+	_, err := log.output.WriteWithLevel([]byte(message), level)
 	return err
 }
