@@ -38,7 +38,7 @@ func NewFormat(formatting string) *Format {
 	// we are should not assing format.placeholders to defaultPlaceholders
 	// because maps in go passes by reference.
 
-	format.SetPlaceholders(defaultPlaceholders)
+	format.SetPlaceholders(DefaultPlaceholders)
 
 	return format
 }

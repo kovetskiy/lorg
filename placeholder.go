@@ -35,7 +35,8 @@ type cacheHash struct {
 var (
 	rePlaceholder = regexp.MustCompile(`\${(\w+)(:([^}]+))?}`)
 
-	defaultPlaceholders = map[string]Placeholder{
+	// DefaultPlaceholders that will be used for new Log instances.
+	DefaultPlaceholders = map[string]Placeholder{
 		"level": PlaceholderLevel,
 		"line":  PlaceholderLine,
 		"file":  PlaceholderFile,
