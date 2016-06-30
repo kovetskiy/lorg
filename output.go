@@ -11,13 +11,13 @@ type SmartOutput interface {
 	WriteWithLevel([]byte, Level) (int, error)
 }
 
-type output struct {
+type Output struct {
 	conditions map[Level][]io.Writer
 	mutex      *sync.Mutex
 }
 
-func NewOutput(stderr io.Writer) SmartOutput {
-	return &output{
+func NewOutput(stderr io.Writer) *Output {
+	return &Output{
 		conditions: map[Level][]io.Writer{
 			LevelFatal:   []io.Writer{stderr},
 			LevelError:   []io.Writer{stderr},
@@ -30,9 +30,9 @@ func NewOutput(stderr io.Writer) SmartOutput {
 	}
 }
 
-func (output *output) SetLevelWriterCondition(
+func (output *Output) SetLevelWriterCondition(
 	level Level, writer ...io.Writer,
-) *output {
+) *Output {
 	output.mutex.Lock()
 	defer output.mutex.Unlock()
 
@@ -41,11 +41,11 @@ func (output *output) SetLevelWriterCondition(
 	return output
 }
 
-func (output *output) Write(buffer []byte) (int, error) {
+func (output *Output) Write(buffer []byte) (int, error) {
 	panic("should be not called")
 }
 
-func (output *output) WriteWithLevel(
+func (output *Output) WriteWithLevel(
 	data []byte, level Level,
 ) (int, error) {
 	output.mutex.Lock()
