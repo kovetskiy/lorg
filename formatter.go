@@ -20,6 +20,9 @@ type Formatter interface {
 	// fmt.Sprintf of logging record.
 	Render(logLevel Level) string
 
+	// SetPrefix sets logger prefix to new value.
+	SetPrefix(prefix string)
+
 	// Reset Formatter state.
 	Reset()
 }

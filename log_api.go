@@ -13,7 +13,7 @@ const (
 	//
 	// See Format structure documentation for information about `${date}` and
 	// `${level}` placeholders.
-	DefaultFormatting = `${time} ${level:[%s]\::left:true} %s`
+	DefaultFormatting = `${time} ${level:[%s]\::right:true} ${prefix}%s`
 )
 
 var (
@@ -34,9 +34,11 @@ var (
 type Log struct {
 	level Level
 
-	output SmartOutput
-	format Formatter
-	mutex  *sync.Mutex
+	output   SmartOutput
+	format   Formatter
+	mutex    *sync.Mutex
+	children []*Log
+	prefix   string
 }
 
 // NewLog creates a new Log instance with default configuration:
@@ -69,6 +71,10 @@ func (log *Log) SetLevel(level Level) {
 	defer log.mutex.Unlock()
 
 	log.level = level
+
+	for _, child := range log.children {
+		child.SetLevel(level)
+	}
 }
 
 // SetFormat sets the logging format for the given log.
@@ -185,4 +191,43 @@ func (log *Log) Trace(value ...interface{}) {
 // Arguments are handled in the manner of fmt.Printf.
 func (log *Log) Tracef(format string, value ...interface{}) {
 	log.logf(LevelTrace, format, value...)
+}
+
+// SetPrefix of given logger, prefix placeholder should be used in logger
+// format.
+func (log *Log) SetPrefix(prefix string) {
+	log.prefix = prefix
+	log.format.SetPrefix(prefix)
+}
+
+// NewChild of given logger, child inherit level, format and output options.
+func (log *Log) NewChild() *Log {
+	log.mutex.Lock()
+	defer log.mutex.Unlock()
+
+	child := NewLog()
+	child.SetOutput(log.output)
+	child.SetLevel(log.level)
+
+	switch format := log.format.(type) {
+	case *Format:
+		childFormat := NewFormat(DefaultFormatting)
+		*childFormat = *format
+		child.SetFormat(childFormat)
+
+	default:
+		child.SetFormat(format)
+	}
+
+	log.children = append(log.children, child)
+
+	return child
+}
+
+// NewChildWithPrefix of given logger, child inherit level, format and output
+// options.
+func (log *Log) NewChildWithPrefix(prefix string) *Log {
+	child := log.NewChild()
+	child.SetPrefix(prefix)
+	return child
 }

@@ -28,10 +28,10 @@ func TestNewFormat_ReturnsFormatWithDefaultFiends(t *testing.T) {
 
 	format := NewFormat(``)
 
-	test.Len(format.placeholders, len(defaultPlaceholders))
+	test.Len(format.placeholders, len(DefaultPlaceholders))
 
 	keys := []string{}
-	for key := range defaultPlaceholders {
+	for key := range DefaultPlaceholders {
 		keys = append(keys, key)
 	}
 
@@ -105,12 +105,12 @@ func TestFormat_SetPlaceholder_ChangesPlaceholdersField(t *testing.T) {
 
 	format.SetPlaceholder("place_foo", placeholderFoo)
 
-	test.Len(format.placeholders, len(defaultPlaceholders)+1)
+	test.Len(format.placeholders, len(DefaultPlaceholders)+1)
 	test.Contains(format.placeholders, "place_foo")
 
 	format.SetPlaceholder("place_bar", placeholderBar)
 
-	test.Len(format.placeholders, len(defaultPlaceholders)+2)
+	test.Len(format.placeholders, len(DefaultPlaceholders)+2)
 	test.Contains(format.placeholders, "place_foo")
 	test.Contains(format.placeholders, "place_bar")
 }

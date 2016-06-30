@@ -1,7 +1,9 @@
 package lorg
 
 import (
+	"bytes"
 	"io/ioutil"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,15 +15,19 @@ type mockFormat struct {
 }
 
 func (mock *mockFormat) SetPlaceholders(_ map[string]Placeholder) {
-	panic("SetPlaceholders method should not be called")
+	panic("should not be called")
 }
 
 func (mock *mockFormat) SetPlaceholder(_ string, _ Placeholder) {
-	panic("SetPlaceholder method should not be called")
+	panic("should not be called")
 }
 
 func (mock *mockFormat) GetPlaceholders() map[string]Placeholder {
-	panic("GetPlaceholder method should not be called")
+	panic("should not be called")
+}
+
+func (mock *mockFormat) SetPrefix(_ string) {
+	panic("should be not called")
 }
 
 func (mock *mockFormat) Render(logLevel Level) string {
@@ -162,4 +168,85 @@ func TestLog_LoggingFunctions_LogsRecordsWithSameLevelOrAbove(
 			"level: %s", setting.level,
 		)
 	}
+}
+
+func TestLog_NewChild_InheritsLevelValue(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	log.SetLevel(LevelDebug)
+
+	child := log.NewChild()
+	test.Equal(child.level, log.level)
+}
+
+func TestLog_NewChild_InheritsOutputValue(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	child := log.NewChild()
+
+	test.Equal(address(child.output), address(log.output))
+}
+
+func TestLog_NewChild_ClonesFormatter(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	child := log.NewChild()
+
+	test.NotEqual(address(child.format), address(log.format))
+	test.EqualValues(child.format, log.format)
+}
+
+func TestLog_SetLevel_ChangesChildrenLevelField(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	child := log.NewChild()
+	child2 := log.NewChild()
+
+	log.SetLevel(LevelTrace)
+
+	test.Equal(child.level, log.level)
+	test.Equal(child2.level, log.level)
+}
+
+func TestLog_NewChild_ChildCantChangeParentLevel(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	child := log.NewChild()
+
+	log.SetLevel(LevelTrace)
+	child.SetLevel(LevelDebug)
+
+	test.NotEqual(child.level, log.level)
+}
+
+func TestLog_NewChildWithPrefix_ReturnsLoggerWithPrefix(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	log.SetFormat(NewFormat(`${prefix}%s`))
+	child := log.NewChildWithPrefix("prefix")
+
+	var buffer bytes.Buffer
+	log.SetOutput(&buffer)
+	child.SetOutput(&buffer)
+
+	log.Info("parent")
+	child.Info("child")
+
+	test.Equal("parent\nprefix child\n", buffer.String())
+}
+
+func address(target interface{}) uintptr {
+	value := reflect.ValueOf(target)
+	switch value.Kind() {
+	case reflect.Ptr, reflect.Interface:
+		value = value.Elem()
+	}
+
+	return value.UnsafeAddr()
 }

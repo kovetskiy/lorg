@@ -1,6 +1,7 @@
 package lorg
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 )
@@ -15,6 +16,7 @@ type Format struct {
 	replacements []replacement
 	placeholders map[string]Placeholder
 	mutex        *sync.RWMutex
+	prefix       string
 }
 
 type replacement struct {
@@ -135,8 +137,12 @@ func (format *Format) compile() {
 		}()
 
 		if !ok {
-			// placeholder with specified name not found
-			continue
+			if placeholderName == "prefix" {
+				placeholder = format.placeholderPrefix
+			} else {
+				// placeholder with specified name not found
+				continue
+			}
 		}
 
 		newReplacement := replacement{
@@ -149,4 +155,21 @@ func (format *Format) compile() {
 	}
 
 	format.compiled = true
+}
+
+// SetPrefix sets new prefix value for given logger formatting.
+func (format *Format) SetPrefix(prefix string) {
+	format.prefix = prefix
+}
+
+func (format *Format) placeholderPrefix(_ Level, value string) string {
+	if format.prefix != "" {
+		if value != "" {
+			return fmt.Sprintf(value, format.prefix) + " "
+		}
+
+		return format.prefix + " "
+	}
+
+	return ""
 }
