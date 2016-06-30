@@ -2,12 +2,10 @@ package lorg
 
 import (
 	"io"
-
-	"github.com/kovetskiy/lorg"
 )
 
 var (
-	logger = lorg.NewLog()
+	logger = NewLog()
 )
 
 // SetLevel sets the logging level for the given log.
