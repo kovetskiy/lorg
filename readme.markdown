@@ -30,7 +30,7 @@ positional options:
 - `short` - use short string representation of logging level, `WARNING -> WARN`.
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`[${level}] %s`),
 )
@@ -45,7 +45,7 @@ Output:
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${level:[%s]} %s`),
 )
@@ -60,7 +60,7 @@ Output:
 ````
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${level:[%s]:left} %s`),
 )
@@ -75,7 +75,7 @@ Output:
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${level:[%s]:right} %s`),
 )
@@ -90,7 +90,7 @@ Output:
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${level:[%s]:left:short} %s`),
 )
@@ -105,7 +105,7 @@ Output:
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${level:[%s]:right:short} %s`),
 )
@@ -130,7 +130,7 @@ Time placeholder returns current time. `time` can take 1 positional option:
 - `layout` - will be to format current time;
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${time:15:04:05} %s`),
 )
@@ -144,7 +144,7 @@ Output:
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${time:15:04} %s`),
 )
@@ -173,7 +173,7 @@ Placeholder accept two modes:
 
 Example:
 
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${file} %s`),
 )
@@ -188,7 +188,7 @@ a.go warning
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${file:short} %s`),
 )
@@ -204,7 +204,7 @@ a.go warning
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${file:long} %s`),
 )
@@ -227,7 +227,7 @@ ${line}
 ```
 
 Example:
-```
+```go
 lorg.SetFormat(
     lorg.NewFormat(`${line} %s`),
 )
