@@ -123,3 +123,20 @@ func Trace(value ...interface{}) {
 func Tracef(format string, value ...interface{}) {
 	logger.logf(LevelTrace, format, value...)
 }
+
+// SetPrefix of given logger, prefix placeholder should be used in logger
+// format.
+func SetPrefix(prefix string) {
+	logger.SetPrefix(prefix)
+}
+
+// NewChild of given logger, child inherit level, format and output options.
+func NewChild() *Log {
+	return logger.NewChild()
+}
+
+// NewChildWithPrefix of given logger, child inherit level, format and output
+// options.
+func NewChildWithPrefix(prefix string) *Log {
+	return logger.NewChildWithPrefix(prefix)
+}
