@@ -100,7 +100,7 @@ func PlaceholderLevel(logLevel Level, optional string) string {
 		align = true
 	}
 
-	if isTrueString(options[2]) {
+	if isTrueString(options[2]) || options[2] == "short" {
 		short = true
 	}
 

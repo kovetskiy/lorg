@@ -120,3 +120,123 @@ Output:
  [WARN] warning
 [DEBUG] debug
 ```
+
+### Time
+
+Time placeholder returns current time. `time` can take 1 positional option:
+
+`${time[:layout]}`
+
+- `layout` - will be to format current time;
+
+Example:
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${time:15:04:05} %s`),
+)
+lorg.Info("info")
+lorg.Warning("warning")
+```
+Output:
+```
+09:21:44 info
+09:21:44 warning
+```
+
+Example:
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${time:15:04} %s`),
+)
+lorg.Info("info")
+lorg.Warning("warning")
+```
+
+Output:
+```
+09:21 info
+09:21 warning
+```
+
+### File
+
+File placeholder returns a filename where has been called logging function.
+
+```
+${file[:mode]}
+```
+
+Placeholder accept two modes:
+
+- `short` - default behavior, return base name of resulting filename.
+- `long` - return full resulting filename
+
+Example:
+
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${file} %s`),
+)
+lorg.Info("info")
+lorg.Warning("warning")
+```
+
+Output:
+```
+a.go info
+a.go warning
+```
+
+Example:
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${file:short} %s`),
+)
+
+lorg.Info("info")
+lorg.Warning("warning")
+```
+
+Output:
+```
+a.go info
+a.go warning
+```
+
+Example:
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${file:long} %s`),
+)
+lorg.Info("info")
+lorg.Warning("warning")
+```
+
+Output
+```
+/home/operator/a.go info
+/home/operator/a.go warning
+```
+
+### Line
+
+Line placeholder returns a number of line where has been called logging function.
+
+```
+${line}
+```
+
+Example:
+```
+lorg.SetFormat(
+    lorg.NewFormat(`${line} %s`),
+)
+lorg.Info("info")
+lorg.Warning("warning")
+```
+
+Output:
+```
+11 info
+12 warning
+```

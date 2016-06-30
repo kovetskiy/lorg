@@ -42,82 +42,84 @@ func SetOutput(output io.Writer) {
 // calls os.Exit(1) after logging.
 // Arguments are handled in the manner of fmt.Print.
 func Fatal(value ...interface{}) {
-	logger.Fatal(value...)
+	logger.log(LevelFatal, value...)
+	Exiter(1)
 }
 
 // Fatalf logs record if given logger level is equal or above LevelFatal, and
 // calls os.Exit(1) after logging.
 // Arguments are handled in the manner of fmt.Print.
 func Fatalf(format string, value ...interface{}) {
-	logger.Fatalf(format, value...)
+	logger.logf(LevelFatal, format, value...)
+	Exiter(1)
 }
 
 // Error logs record if given logger level is equal or above LevelError.
 // Arguments are handled in the manner of fmt.Print.
 func Error(value ...interface{}) {
-	logger.Error(value...)
+	logger.log(LevelError, value...)
 }
 
 // Errorf logs record if given logger level is equal or above LevelError.
 // Arguments are handled in the manner of fmt.Printf.
 func Errorf(format string, value ...interface{}) {
-	logger.Errorf(format, value...)
+	logger.logf(LevelError, format, value...)
 }
 
 // Warning logs record if given logger level is equal or above LevelWarning.
 // Arguments are handled in the manner of fmt.Print.
 func Warning(value ...interface{}) {
-	logger.Warning(value...)
+	logger.log(LevelWarning, value...)
 }
 
 // Warningf logs record if given logger level is equal or above LevelWarning.
 // Arguments are handled in the manner of fmt.Printf.
 func Warningf(format string, value ...interface{}) {
-	logger.Warningf(format, value...)
+	logger.logf(LevelWarning, format, value...)
 }
 
 // Print is pseudonym for Info
 func Print(value ...interface{}) {
-	logger.Print(value...)
+	logger.log(LevelInfo, value...)
 }
 
 // Printf is pseudonym for Infof
 func Printf(format string, value ...interface{}) {
-	logger.Printf(format, value...)
+	logger.logf(LevelInfo, format, value...)
 }
 
 // Info logs record if given logger level is equal or above LevelInfo.
 // Arguments are handled in the manner of fmt.Print.
 func Info(value ...interface{}) {
-	logger.Info(value...)
+	logger.log(LevelInfo, value...)
 }
 
 // Infof logs record if given logger level is equal or above LevelInfo.
 // Arguments are handled in the manner of fmt.Printf.
 func Infof(format string, value ...interface{}) {
-	logger.Infof(format, value...)
+	logger.logf(LevelInfo, format, value...)
 }
 
 // Debug logs record if given logger level is equal or above LevelDebug.
 // Arguments are handled in the manner of fmt.Print.
 func Debug(value ...interface{}) {
-	logger.Debug(value...)
+	logger.log(LevelDebug, value...)
 }
 
 // Debugf logs record if given logger level is equal or above LevelDebug.
 // Arguments are handled in the manner of fmt.Printf.
 func Debugf(format string, value ...interface{}) {
-	logger.Debugf(format, value...)
+	logger.logf(LevelDebug, format, value...)
 }
 
 // Trace logs record if given logger level is equal or above LevelTrace.
 // Arguments are handled in the manner of fmt.Print.
 func Trace(value ...interface{}) {
-	logger.Trace(value...)
+	logger.log(LevelTrace, value...)
 }
 
 // Tracef logs record if given logger level is equal or above LevelTrace.
 // Arguments are handled in the manner of fmt.Printf.
 func Tracef(format string, value ...interface{}) {
-	logger.Tracef(format, value...)
+	logger.logf(LevelTrace, format, value...)
 }
