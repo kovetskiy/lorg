@@ -18,10 +18,7 @@ type Formatter interface {
 	// Log.Print/Log.Warning/Log.Error/etc. will calls formatter Render
 	// Render should return string for Log instance which will be used for
 	// fmt.Sprintf of logging record.
-	Render(logLevel Level) string
-
-	// SetPrefix sets logger prefix to new value.
-	SetPrefix(prefix string)
+	Render(logLevel Level, prefix string) string
 
 	// Reset Formatter state.
 	Reset()

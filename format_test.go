@@ -128,7 +128,7 @@ func TestFormat_Render_UsesPlaceholdersFieldForMatchingPlaceholders(
 	}
 
 	format.SetPlaceholders(placeholders)
-	format.Render(LevelWarning)
+	format.Render(LevelWarning, "")
 
 	test.Equal(
 		[]string{`${place_foo}`},
@@ -144,7 +144,7 @@ func TestFormat_Render_UsesPlaceholdersFieldForMatchingPlaceholders(
 
 	format.Reset()
 
-	format.Render(LevelWarning)
+	format.Render(LevelWarning, "")
 
 	test.Equal(
 		[]string{`${place_foo}`, `${place_bar:barvalue}`},
@@ -265,7 +265,7 @@ func TestFormat_Render_PlaceholderRegexpMatching(t *testing.T) {
 	for _, testcase := range testcases {
 		format := NewFormat(testcase.format)
 		format.SetPlaceholders(placeholders)
-		format.Render(LevelError)
+		format.Render(LevelError, "")
 
 		test.Equal(
 			testcase.expectedReplacements,
@@ -291,7 +291,7 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 		},
 	)
 
-	rendered := format.Render(LevelWarning)
+	rendered := format.Render(LevelWarning, "")
 
 	test.Equal(
 		"fmt: [place_foo@] [place_foo@1] [place_bar@a b c:d e f]",
@@ -314,7 +314,7 @@ func TestFormat_Render_CallsSettedPlaceholders(t *testing.T) {
 	format.SetPlaceholder("place_bar", fabric.fabricate("fakebar"))
 	format.Reset()
 
-	rendered = format.Render(LevelWarning)
+	rendered = format.Render(LevelWarning, "")
 
 	test.Equal(
 		"fmt: [place_foo@] [place_foo@1] [fakebar@a b c:d e f]",
@@ -349,7 +349,7 @@ func TestFormat_Render_CallsSettedPlaceholdersAndPassesLogLevel(t *testing.T) {
 		},
 	)
 
-	format.Render(LevelDebug)
+	format.Render(LevelDebug, "")
 
 	test.Equal(
 		LevelDebug, placeholderLogLevel,
@@ -371,7 +371,7 @@ func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
 		},
 	)
 
-	format.Render(LevelWarning)
+	format.Render(LevelWarning, "")
 
 	test.NotEmpty(format.replacements)
 	test.True(format.compiled)

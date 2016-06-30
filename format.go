@@ -1,7 +1,6 @@
 package lorg
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 )
@@ -16,7 +15,6 @@ type Format struct {
 	replacements []replacement
 	placeholders map[string]Placeholder
 	mutex        *sync.RWMutex
-	prefix       string
 }
 
 type replacement struct {
@@ -87,7 +85,7 @@ func (format *Format) Reset() {
 // Render generates string which will be used by Log instance.
 // Here is logLevel property just for a placeholders which want to show
 // logging level, logLevel will be passed to all ran placeholders.
-func (format *Format) Render(logLevel Level) string {
+func (format *Format) Render(logLevel Level, prefix string) string {
 	if !format.compiled {
 		format.compile()
 	}
@@ -110,6 +108,8 @@ func (format *Format) Render(logLevel Level) string {
 			rendered, replacement.value, placeholderValue, 1,
 		)
 	}
+
+	rendered = strings.Replace(rendered, `${prefix}`, getPrefix(prefix), 1)
 
 	return rendered
 }
@@ -137,12 +137,8 @@ func (format *Format) compile() {
 		}()
 
 		if !ok {
-			if placeholderName == "prefix" {
-				placeholder = format.placeholderPrefix
-			} else {
-				// placeholder with specified name not found
-				continue
-			}
+			// placeholder with specified name not found
+			continue
 		}
 
 		newReplacement := replacement{
@@ -157,18 +153,9 @@ func (format *Format) compile() {
 	format.compiled = true
 }
 
-// SetPrefix sets new prefix value for given logger formatting.
-func (format *Format) SetPrefix(prefix string) {
-	format.prefix = prefix
-}
-
-func (format *Format) placeholderPrefix(_ Level, value string) string {
-	if format.prefix != "" {
-		if value != "" {
-			return fmt.Sprintf(value, format.prefix) + " "
-		}
-
-		return format.prefix + " "
+func getPrefix(prefix string) string {
+	if prefix != "" {
+		return prefix + " "
 	}
 
 	return ""

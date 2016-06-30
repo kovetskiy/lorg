@@ -30,7 +30,7 @@ func (mock *mockFormat) SetPrefix(_ string) {
 	panic("should be not called")
 }
 
-func (mock *mockFormat) Render(logLevel Level) string {
+func (mock *mockFormat) Render(logLevel Level, prefix string) string {
 	mock.callsRender++
 	mock.lastLogLevel = logLevel
 	return "[testcase] %s"
@@ -189,16 +189,6 @@ func TestLog_NewChild_InheritsOutputValue(t *testing.T) {
 	test.Equal(address(child.output), address(log.output))
 }
 
-func TestLog_NewChild_ClonesFormatter(t *testing.T) {
-	test := assert.New(t)
-
-	log := NewLog()
-	child := log.NewChild()
-
-	test.NotEqual(address(child.format), address(log.format))
-	test.EqualValues(child.format, log.format)
-}
-
 func TestLog_SetLevel_ChangesChildrenLevelField(t *testing.T) {
 	test := assert.New(t)
 
@@ -227,18 +217,21 @@ func TestLog_NewChild_ChildCantChangeParentLevel(t *testing.T) {
 func TestLog_NewChildWithPrefix_ReturnsLoggerWithPrefix(t *testing.T) {
 	test := assert.New(t)
 
-	log := NewLog()
-	log.SetFormat(NewFormat(`${prefix}%s`))
-	child := log.NewChildWithPrefix("prefix")
-
 	var buffer bytes.Buffer
+
+	log := NewLog()
 	log.SetOutput(&buffer)
-	child.SetOutput(&buffer)
+	log.SetFormat(NewFormat(`${prefix}%s`))
+	child := log.NewChildWithPrefix("child")
+	subchild := child.NewChildWithPrefix("subchild")
 
-	log.Info("parent")
-	child.Info("child")
+	log.Info("1")
+	child.Info("2")
+	subchild.Info("3")
+	child.Info("4")
+	log.Info("5")
 
-	test.Equal("parent\nprefix child\n", buffer.String())
+	test.Equal("1\nchild 2\nsubchild 3\nchild 4\n5\n", buffer.String())
 }
 
 func address(target interface{}) uintptr {

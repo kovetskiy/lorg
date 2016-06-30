@@ -29,7 +29,7 @@ func (log *Log) doLog(level Level, value ...interface{}) {
 		log.mutex.Lock()
 		defer log.mutex.Unlock()
 
-		format = log.format.Render(level)
+		format = log.format.Render(level, log.prefix)
 	}()
 
 	// here is no need for Sprintf, so just replace %s to message

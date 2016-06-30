@@ -197,7 +197,6 @@ func (log *Log) Tracef(format string, value ...interface{}) {
 // format.
 func (log *Log) SetPrefix(prefix string) {
 	log.prefix = prefix
-	log.format.SetPrefix(prefix)
 }
 
 // NewChild of given logger, child inherit level, format and output options.
@@ -208,16 +207,7 @@ func (log *Log) NewChild() *Log {
 	child := NewLog()
 	child.SetOutput(log.output)
 	child.SetLevel(log.level)
-
-	switch format := log.format.(type) {
-	case *Format:
-		childFormat := NewFormat(DefaultFormatting)
-		*childFormat = *format
-		child.SetFormat(childFormat)
-
-	default:
-		child.SetFormat(format)
-	}
+	child.SetFormat(log.format)
 
 	log.children = append(log.children, child)
 
