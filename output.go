@@ -16,7 +16,7 @@ type output struct {
 	mutex      *sync.Mutex
 }
 
-func NewOutput(stderr io.Writer) *output {
+func NewOutput(stderr io.Writer) SmartOutput {
 	return &output{
 		conditions: map[Level][]io.Writer{
 			LevelFatal:   []io.Writer{stderr},

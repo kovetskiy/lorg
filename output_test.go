@@ -16,7 +16,7 @@ func TestOutput_SetLevelWriterCondition_SetsAdditionalWriter(t *testing.T) {
 
 	logger := NewLog()
 	logger.SetOutput(
-		NewOutput(&buffer0).SetLevelWriterCondition(
+		NewOutput(&buffer0).(*output).SetLevelWriterCondition(
 			LevelWarning, &buffer1, &buffer2,
 		),
 	)
