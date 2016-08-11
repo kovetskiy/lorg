@@ -5,11 +5,15 @@ import (
 )
 
 var (
-	logger lorg.Logger = lorg.NewLog()
+	logger *lorg.Log = lorg.NewLog()
 )
 
-func SetLogger(log lorg.Logger) {
+func SetLogger(log *lorg.Log) {
 	logger = log
+}
+
+func SetIndentLine(enabled bool) {
+	logger.SetIndentLines(enabled)
 }
 
 func Fatalf(format string, values ...interface{}) {
