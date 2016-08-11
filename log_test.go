@@ -234,6 +234,27 @@ func TestLog_NewChildWithPrefix_ReturnsLoggerWithPrefix(t *testing.T) {
 	test.Equal("1\nchild 2\nsubchild 3\nchild 4\n5\n", buffer.String())
 }
 
+func TestLog_IndentLines(t *testing.T) {
+	test := assert.New(t)
+
+	var buffer bytes.Buffer
+
+	log := NewLog()
+	log.SetOutput(&buffer)
+	log.SetFormat(NewFormat(`[blah] %s`))
+	log.SetIndentLines(true)
+
+	log.Info("1")
+	log.Info("2\n3\n4")
+
+	test.Equal(
+		`[blah] 1
+[blah] 2
+       3
+       4
+`, buffer.String())
+}
+
 func address(target interface{}) uintptr {
 	value := reflect.ValueOf(target)
 	switch value.Kind() {

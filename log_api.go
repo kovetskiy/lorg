@@ -34,11 +34,12 @@ var (
 type Log struct {
 	level Level
 
-	output   SmartOutput
-	format   Formatter
-	mutex    *sync.Mutex
-	children []*Log
-	prefix   string
+	output      SmartOutput
+	format      Formatter
+	indentLines bool
+	mutex       *sync.Mutex
+	children    []*Log
+	prefix      string
 }
 
 // NewLog creates a new Log instance with default configuration:
@@ -105,6 +106,18 @@ func (log *Log) SetOutput(output io.Writer) {
 	}
 
 	log.output = output.(SmartOutput)
+}
+
+// SetIndentLines changes Log's option that responsible for indenting log entry
+// lines in one format.
+// With this option log entries with newline symbols will be indented like as
+// following:
+//
+// [INFO] before-new-line
+//        after-new-line
+//
+func (log *Log) SetIndentLines(value bool) {
+	log.indentLines = value
 }
 
 // Fatal logs record if given logger level is equal or above LevelFatal, and

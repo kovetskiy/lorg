@@ -32,22 +32,40 @@ func (log *Log) doLog(level Level, value ...interface{}) {
 		format = log.format.Render(level, log.prefix)
 	}()
 
-	// here is no need for Sprintf, so just replace %s to message
-	message := strings.Replace(format, "%s", fmt.Sprint(value...), 1)
-	message = message + "\n"
+	text := fmt.Sprint(value...)
+	if log.indentLines {
+		shift := strings.Index(format, "%s")
+		if shift > 0 {
+			text = indent(text, shift)
+		}
+	}
+
+	// here is no need for Sprintf, so just replace %s to text
+	entry := strings.Replace(format, "%s", text, 1) + "\n"
 
 	func() {
 		log.mutex.Lock()
 		defer log.mutex.Unlock()
 
-		err := log.write(message, level)
+		err := log.write(entry, level)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to write to log: %#v", err)
 		}
 	}()
 }
 
-func (log *Log) write(message string, level Level) error {
-	_, err := log.output.WriteWithLevel([]byte(message), level)
+func (log *Log) write(text string, level Level) error {
+	_, err := log.output.WriteWithLevel([]byte(text), level)
 	return err
+}
+
+func indent(text string, shift int) string {
+	text = strings.Replace(
+		text,
+		"\n",
+		"\n"+strings.Repeat(" ", shift),
+		-1,
+	)
+
+	return text
 }
