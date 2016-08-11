@@ -5,29 +5,61 @@ import (
 )
 
 var (
-	Logger = lorg.NewLog()
+	logger *lorg.Log = lorg.NewLog()
 )
 
+func SetLogger(log *lorg.Log) {
+	logger = log
+}
+
+func SetIndentLine(enabled bool) {
+	logger.SetIndentLines(enabled)
+}
+
 func Fatalf(format string, values ...interface{}) {
-	Logger.Fatalf(format, values...)
+	logger.Fatalf(format, values...)
 }
 
 func Errorf(format string, values ...interface{}) {
-	Logger.Errorf(format, values...)
+	logger.Errorf(format, values...)
 }
 
 func Warningf(format string, values ...interface{}) {
-	Logger.Warningf(format, values...)
+	logger.Warningf(format, values...)
 }
 
 func Infof(format string, values ...interface{}) {
-	Logger.Infof(format, values...)
+	logger.Infof(format, values...)
 }
 
 func Debugf(format string, values ...interface{}) {
-	Logger.Debugf(format, values...)
+	logger.Debugf(format, values...)
 }
 
 func Tracef(format string, values ...interface{}) {
-	Logger.Tracef(format, values...)
+	logger.Tracef(format, values...)
+}
+
+func Fatal(values ...interface{}) {
+	logger.Fatal(values...)
+}
+
+func Error(values ...interface{}) {
+	logger.Error(values...)
+}
+
+func Warning(values ...interface{}) {
+	logger.Warning(values...)
+}
+
+func Info(values ...interface{}) {
+	logger.Info(values...)
+}
+
+func Debug(values ...interface{}) {
+	logger.Debug(values...)
+}
+
+func Trace(values ...interface{}) {
+	logger.Trace(values...)
 }
