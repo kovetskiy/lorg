@@ -3,7 +3,12 @@ package lorg
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
+)
+
+var (
+	reEscapeCode = regexp.MustCompile("\x1b[^m]+m")
 )
 
 func (log *Log) log(level Level, value ...interface{}) {
@@ -34,7 +39,7 @@ func (log *Log) doLog(level Level, value ...interface{}) {
 
 	text := fmt.Sprint(value...)
 	if log.indentLines {
-		shift := strings.Index(format, "%s")
+		shift := strings.Index(trimStyles(format), "%s")
 		if shift > 0 {
 			text = indent(text, shift)
 		}
@@ -68,4 +73,8 @@ func indent(text string, shift int) string {
 	)
 
 	return text
+}
+
+func trimStyles(text string) string {
+	return reEscapeCode.ReplaceAllLiteralString(text, "")
 }

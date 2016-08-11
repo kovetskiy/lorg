@@ -255,6 +255,33 @@ func TestLog_IndentLines(t *testing.T) {
 `, buffer.String())
 }
 
+func TestLog_IndentLinesWithTrimStyle(t *testing.T) {
+	test := assert.New(t)
+
+	var buffer bytes.Buffer
+
+	log := NewLog()
+	log.SetOutput(&buffer)
+	log.SetFormat(
+		NewFormat("\x1b[48;5;2mblah: %s"),
+	)
+
+	log.SetIndentLines(true)
+
+	log.Info("1")
+	log.Info("2\n3\n4")
+
+	test.Equal(
+		"\x1b[48;5;2m"+
+			"blah: 1\n"+
+			"\x1b[48;5;2m"+
+			"blah: 2\n"+
+			"      3\n"+
+			"      4\n",
+		buffer.String(),
+	)
+}
+
 func address(target interface{}) uintptr {
 	value := reflect.ValueOf(target)
 	switch value.Kind() {
