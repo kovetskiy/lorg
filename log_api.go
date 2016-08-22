@@ -221,6 +221,7 @@ func (log *Log) NewChild() *Log {
 	child.SetOutput(log.output)
 	child.SetLevel(log.level)
 	child.SetFormat(log.format)
+	child.SetIndentLines(log.indentLines)
 
 	log.children = append(log.children, child)
 
