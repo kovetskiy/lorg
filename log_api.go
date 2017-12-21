@@ -78,6 +78,14 @@ func (log *Log) SetLevel(level Level) {
 	}
 }
 
+// GetLevel returns the logging level for the given logger.
+func (log *Log) GetLevel() Level {
+	log.mutex.Lock()
+	defer log.mutex.Unlock()
+
+	return log.level
+}
+
 // SetFormat sets the logging format for the given log.
 // All log records will be formatted using specified formatter.
 //

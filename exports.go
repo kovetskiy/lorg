@@ -18,6 +18,11 @@ func SetLevel(level Level) {
 	logger.SetLevel(level)
 }
 
+// GetLevel returns the logging level for the given logger.
+func GetLevel() Level {
+	return logger.GetLevel()
+}
+
 // SetFormat sets the logging format for the given log.
 // All log records will be formatted using specified formatter.
 //

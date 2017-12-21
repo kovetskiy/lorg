@@ -85,6 +85,19 @@ func TestLog_SetLevel_ChangesLevelField(t *testing.T) {
 	test.Equal(LevelWarning, log.level)
 }
 
+func TestLog_GetLevel_ReturnsCurrentLevel(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	test.Equal(LevelInfo, log.GetLevel())
+
+	log.SetLevel(LevelWarning)
+	test.Equal(LevelWarning, log.GetLevel())
+
+	log.SetLevel(LevelDebug)
+	test.Equal(LevelDebug, log.GetLevel())
+}
+
 func TestLog_SetOutput_ChangesOutputField(t *testing.T) {
 	test := assert.New(t)
 
