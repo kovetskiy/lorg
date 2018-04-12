@@ -227,6 +227,36 @@ func TestLog_NewChild_ChildCantChangeParentLevel(t *testing.T) {
 	test.NotEqual(child.level, log.level)
 }
 
+func TestLog_NewChild_ChildRunsExiter(t *testing.T) {
+	test := assert.New(t)
+
+	log := NewLog()
+	child := log.NewChild()
+
+	parentCalls := []int{}
+	parentExiter := func(code int) {
+		parentCalls = append(parentCalls, code)
+	}
+	childCalls := []int{}
+	childExiter := func(code int) {
+		childCalls = append(childCalls, code)
+	}
+	log.SetExiter(parentExiter)
+	child.SetExiter(childExiter)
+
+	log.Fatal("a")
+	test.EqualValues([]int{1}, parentCalls)
+	test.EqualValues([]int{}, childCalls)
+
+	child.Fatal("b")
+	test.EqualValues([]int{1}, parentCalls)
+	test.EqualValues([]int{1}, childCalls)
+
+	child.Fatalf("b")
+	test.EqualValues([]int{1}, parentCalls)
+	test.EqualValues([]int{1, 1}, childCalls)
+}
+
 func TestLog_NewChildWithPrefix_ReturnsLoggerWithPrefix(t *testing.T) {
 	test := assert.New(t)
 

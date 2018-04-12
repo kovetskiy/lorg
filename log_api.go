@@ -40,6 +40,7 @@ type Log struct {
 	mutex       *sync.Mutex
 	children    []*Log
 	prefix      string
+	exiter      func(int)
 }
 
 // NewLog creates a new Log instance with default configuration:
@@ -56,9 +57,16 @@ func NewLog() *Log {
 		format: defaultFormat,
 		output: defaultOutput,
 		mutex:  &sync.Mutex{},
+		exiter: Exiter,
 	}
 
 	return log
+}
+
+// SetExiter sets given function as callback for Fatal messages, this function
+// will be running instead of default Exiter which is os.Exit if specified.
+func (log *Log) SetExiter(exiter func(int)) {
+	log.exiter = exiter
 }
 
 // SetLevel sets the logging level for the given log.
@@ -133,7 +141,7 @@ func (log *Log) SetIndentLines(value bool) {
 // Arguments are handled in the manner of fmt.Print.
 func (log *Log) Fatal(value ...interface{}) {
 	log.log(LevelFatal, value...)
-	Exiter(1)
+	log.exiter(1)
 }
 
 // Fatalf logs record if given logger level is equal or above LevelFatal, and
@@ -141,7 +149,7 @@ func (log *Log) Fatal(value ...interface{}) {
 // Arguments are handled in the manner of fmt.Print.
 func (log *Log) Fatalf(format string, value ...interface{}) {
 	log.logf(LevelFatal, format, value...)
-	Exiter(1)
+	log.exiter(1)
 }
 
 // Error logs record if given logger level is equal or above LevelError.
