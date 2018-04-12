@@ -53,7 +53,7 @@ func (output *Output) WriteWithLevel(
 
 	writers, ok := output.conditions[level]
 	if !ok {
-		return 0, fmt.Errorf("there is no writers for level ", level)
+		return 0, fmt.Errorf("there is no writers for level %s", level)
 	}
 
 	var written int
