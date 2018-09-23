@@ -37,6 +37,7 @@ type Log struct {
 	output      SmartOutput
 	format      Formatter
 	indentLines bool
+	shiftIndent int
 	mutex       *sync.Mutex
 	children    []*Log
 	prefix      string
@@ -134,6 +135,15 @@ func (log *Log) SetOutput(output io.Writer) {
 //
 func (log *Log) SetIndentLines(value bool) {
 	log.indentLines = value
+}
+
+// SetShiftIndent forces logger to indent all nested lines using given padding
+//
+// SetShiftIndent(len("[INFO] "))
+// [INFO] before-new-line
+//        after-new-line
+func (log *Log) SetShiftIndent(shift int) {
+	log.shiftIndent = shift
 }
 
 // Fatal logs record if given logger level is equal or above LevelFatal, and

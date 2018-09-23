@@ -298,7 +298,7 @@ func TestLog_IndentLines(t *testing.T) {
 `, buffer.String())
 }
 
-func TestLog_IndentLinesWithTrimStyle(t *testing.T) {
+func TestLog_IndentLinesShiftINdent(t *testing.T) {
 	test := assert.New(t)
 
 	var buffer bytes.Buffer
@@ -309,7 +309,7 @@ func TestLog_IndentLinesWithTrimStyle(t *testing.T) {
 		NewFormat("\x1b[48;5;2mblah: %s"),
 	)
 
-	log.SetIndentLines(true)
+	log.SetShiftIndent(len("blah: "))
 
 	log.Info("1")
 	log.Info("2\n3\n4")
