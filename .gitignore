@@ -1,3 +1,6 @@
 /cover
 /cover.html
 /lorg.test
+/*.pprof
+/*.svg
+/*.out

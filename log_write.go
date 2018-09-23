@@ -23,14 +23,7 @@ func (log *Log) logf(level Level, format string, value ...interface{}) {
 }
 
 func (log *Log) doLog(level Level, value ...interface{}) {
-	var format string
-
-	func() {
-		log.mutex.Lock()
-		defer log.mutex.Unlock()
-
-		format = log.format.Render(level, log.prefix)
-	}()
+	format := log.format.Render(level, log.prefix)
 
 	text := fmt.Sprint(value...)
 
@@ -46,15 +39,12 @@ func (log *Log) doLog(level Level, value ...interface{}) {
 	// here is no need for Sprintf, so just replace %s to text
 	entry := strings.Replace(format, "%s", text, 1) + "\n"
 
-	func() {
-		log.mutex.Lock()
-		defer log.mutex.Unlock()
-
-		err := log.write(entry, level)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to write to log: %#v", err)
-		}
-	}()
+	log.mutex.Lock()
+	err := log.write(entry, level)
+	log.mutex.Unlock()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to write to log: %#v", err)
+	}
 }
 
 func (log *Log) write(text string, level Level) error {

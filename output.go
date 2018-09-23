@@ -34,9 +34,10 @@ func (output *Output) SetLevelWriterCondition(
 	level Level, writer ...io.Writer,
 ) *Output {
 	output.mutex.Lock()
-	defer output.mutex.Unlock()
 
 	output.conditions[level] = writer
+
+	output.mutex.Unlock()
 
 	return output
 }
@@ -49,7 +50,6 @@ func (output *Output) WriteWithLevel(
 	data []byte, level Level,
 ) (int, error) {
 	output.mutex.Lock()
-	defer output.mutex.Unlock()
 
 	writers, ok := output.conditions[level]
 	if !ok {
@@ -61,6 +61,8 @@ func (output *Output) WriteWithLevel(
 	for _, writer := range writers {
 		written, err = writer.Write(data)
 	}
+
+	output.mutex.Unlock()
 
 	return written, err
 }

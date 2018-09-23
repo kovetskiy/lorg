@@ -78,21 +78,23 @@ func (log *Log) SetExiter(exiter func(int)) {
 // logged also.
 func (log *Log) SetLevel(level Level) {
 	log.mutex.Lock()
-	defer log.mutex.Unlock()
 
 	log.level = level
 
 	for _, child := range log.children {
 		child.SetLevel(level)
 	}
+
+	log.mutex.Unlock()
 }
 
 // GetLevel returns the logging level for the given logger.
 func (log *Log) GetLevel() Level {
 	log.mutex.Lock()
-	defer log.mutex.Unlock()
+	level := log.level
+	log.mutex.Unlock()
 
-	return log.level
+	return level
 }
 
 // SetFormat sets the logging format for the given log.
@@ -104,9 +106,8 @@ func (log *Log) GetLevel() Level {
 // See: DefaultFormatting
 func (log *Log) SetFormat(format Formatter) {
 	log.mutex.Lock()
-	defer log.mutex.Unlock()
-
 	log.format = format
+	log.mutex.Unlock()
 }
 
 // SetOutput sets output of given log instance, the log records are
@@ -116,13 +117,14 @@ func (log *Log) SetFormat(format Formatter) {
 // logs all records to stderr (os.Stderr)
 func (log *Log) SetOutput(output io.Writer) {
 	log.mutex.Lock()
-	defer log.mutex.Unlock()
 
 	if _, ok := output.(SmartOutput); !ok {
 		output = NewOutput(output)
 	}
 
 	log.output = output.(SmartOutput)
+
+	log.mutex.Unlock()
 }
 
 // SetIndentLines changes Log's option that responsible for indenting log entry
@@ -241,7 +243,6 @@ func (log *Log) SetPrefix(prefix string) {
 // NewChild of given logger, child inherit level, format and output options.
 func (log *Log) NewChild() *Log {
 	log.mutex.Lock()
-	defer log.mutex.Unlock()
 
 	child := NewLog()
 	child.SetOutput(log.output)
@@ -250,6 +251,8 @@ func (log *Log) NewChild() *Log {
 	child.SetIndentLines(log.indentLines)
 
 	log.children = append(log.children, child)
+
+	log.mutex.Unlock()
 
 	return child
 }

@@ -217,26 +217,26 @@ func options(str string, count int) []string {
 
 func (cache *cacheHash) reset() {
 	cache.Lock()
-	defer cache.Unlock()
 	cache.hash = zhash.NewHash()
+	cache.Unlock()
 }
 
 func (cache *cacheHash) getString(path ...string) string {
 	cache.RLock()
-	defer cache.RUnlock()
 	value, _ := cache.hash.GetString(path...)
+	cache.RUnlock()
 	return value
 }
 
 func (cache *cacheHash) getStringSlice(path ...string) []string {
 	cache.RLock()
-	defer cache.RUnlock()
 	value, _ := cache.hash.GetStringSlice(path...)
+	cache.RUnlock()
 	return value
 }
 
 func (cache *cacheHash) set(value interface{}, path ...string) {
 	cache.Lock()
-	defer cache.Unlock()
 	cache.hash.Set(value, path...)
+	cache.Unlock()
 }

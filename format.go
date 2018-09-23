@@ -49,9 +49,8 @@ func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 	format.Reset()
 
 	format.mutex.Lock()
-	defer format.mutex.Unlock()
-
 	format.placeholders[name] = placeholder
+	format.mutex.Unlock()
 }
 
 // SetPlaceholders sets specified placeholders for given format.
@@ -59,12 +58,13 @@ func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
 	format.Reset()
 
 	format.mutex.Lock()
-	defer format.mutex.Unlock()
 
 	format.placeholders = map[string]Placeholder{}
 	for placeholderName, placeholder := range placeholders {
 		format.placeholders[placeholderName] = placeholder
 	}
+
+	format.mutex.Unlock()
 }
 
 // GetPlaceholders returns placeholders of given format.
@@ -75,11 +75,12 @@ func (format *Format) GetPlaceholders() map[string]Placeholder {
 // Reset resets state of given format.
 func (format *Format) Reset() {
 	format.mutex.Lock()
-	defer format.mutex.Unlock()
 
 	format.replacements = []replacement{}
 	format.compiled = false
 	cache.reset()
+
+	format.mutex.Unlock()
 }
 
 // Render generates string which will be used by Log instance.
@@ -90,24 +91,21 @@ func (format *Format) Render(logLevel Level, prefix string) string {
 		format.compile()
 	}
 
+	format.mutex.RLock()
 	rendered := format.formatting
 	for _, replacement := range format.replacements {
 		var placeholderValue string
 
-		func() {
-			format.mutex.RLock()
-			defer format.mutex.RUnlock()
-
-			placeholderValue = replacement.placeholder(
-				logLevel,
-				replacement.placeholderValue,
-			)
-		}()
+		placeholderValue = replacement.placeholder(
+			logLevel,
+			replacement.placeholderValue,
+		)
 
 		rendered = strings.Replace(
 			rendered, replacement.value, placeholderValue, 1,
 		)
 	}
+	format.mutex.RUnlock()
 
 	rendered = strings.Replace(rendered, `${prefix}`, getPrefix(prefix), 1)
 
@@ -118,6 +116,10 @@ func (format *Format) compile() {
 	// reset compiled replacements
 	format.Reset()
 
+	var placeholder Placeholder
+	var ok bool
+
+	format.mutex.RLock()
 	matches := rePlaceholder.FindAllStringSubmatch(format.formatting, -1)
 	for _, match := range matches {
 		var (
@@ -126,16 +128,7 @@ func (format *Format) compile() {
 			placeholderValue = match[3]
 		)
 
-		var placeholder Placeholder
-		var ok bool
-
-		func() {
-			format.mutex.RLock()
-			defer format.mutex.RUnlock()
-
-			placeholder, ok = format.placeholders[placeholderName]
-		}()
-
+		placeholder, ok = format.placeholders[placeholderName]
 		if !ok {
 			// placeholder with specified name not found
 			continue
@@ -149,6 +142,7 @@ func (format *Format) compile() {
 
 		format.replacements = append(format.replacements, newReplacement)
 	}
+	format.mutex.RUnlock()
 
 	format.compiled = true
 }
