@@ -12,3 +12,7 @@
 - [x] Line
 - [x] File (long/short)
 - [x] Time
+
+# License
+
+This project is licensed under the terms of the MIT license.
