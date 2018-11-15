@@ -240,3 +240,7 @@ Output:
 11 info
 12 warning
 ```
+
+# License
+
+This project is licensed under the terms of the MIT license.
