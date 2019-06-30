@@ -56,7 +56,7 @@ const (
 	// PlaceholderCallStackLevel should be used as argument to
 	// runtime.Caller if placeholder want to get information about calling log
 	// functions.
-	PlaceholderCallStackLevel = 7
+	PlaceholderCallStackLevel = 5
 )
 
 var (
