@@ -145,3 +145,24 @@ func NewChild() *Log {
 func NewChildWithPrefix(prefix string) *Log {
 	return logger.NewChildWithPrefix(prefix)
 }
+
+// SetIndentLines changes Log's option that responsible for indenting log entry
+// lines in one format.
+// With this option log entries with newline symbols will be indented like as
+// following:
+//
+// [INFO] before-new-line
+//        after-new-line
+//
+func SetIndentLines(value bool) {
+	logger.SetIndentLines(value)
+}
+
+// SetShiftIndent forces logger to indent all nested lines using given padding
+//
+// SetShiftIndent(len("[INFO] "))
+// [INFO] before-new-line
+//        after-new-line
+func SetShiftIndent(shift int) {
+	logger.SetShiftIndent(shift)
+}
