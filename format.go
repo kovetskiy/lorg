@@ -10,11 +10,12 @@ import (
 //
 // Do not instantiate Format instance without using NewFormat.
 type Format struct {
-	formatting   string
-	compileOnce  *sync.Once
-	replacements []replacement
-	placeholders map[string]Placeholder
-	mutex        *sync.RWMutex
+	formatting       string
+	compiled         bool
+	compileMutex     *sync.Mutex
+	replacements     []replacement
+	placeholders     map[string]Placeholder
+	placeholderMutex *sync.RWMutex
 }
 
 type replacement struct {
@@ -31,8 +32,9 @@ type replacement struct {
 // SetPlaceholder methods.
 func NewFormat(formatting string) *Format {
 	format := &Format{
-		formatting: formatting,
-		mutex:      &sync.RWMutex{},
+		formatting:       formatting,
+		placeholderMutex: &sync.RWMutex{},
+		compileMutex:     &sync.Mutex{},
 	}
 
 	// we are should not assing format.placeholders to defaultPlaceholders
@@ -48,23 +50,23 @@ func NewFormat(formatting string) *Format {
 func (format *Format) SetPlaceholder(name string, placeholder Placeholder) {
 	format.Reset()
 
-	format.mutex.Lock()
+	format.placeholderMutex.Lock()
 	format.placeholders[name] = placeholder
-	format.mutex.Unlock()
+	format.placeholderMutex.Unlock()
 }
 
 // SetPlaceholders sets specified placeholders for given format.
 func (format *Format) SetPlaceholders(placeholders map[string]Placeholder) {
 	format.Reset()
 
-	format.mutex.Lock()
+	format.placeholderMutex.Lock()
 
 	format.placeholders = map[string]Placeholder{}
 	for placeholderName, placeholder := range placeholders {
 		format.placeholders[placeholderName] = placeholder
 	}
 
-	format.mutex.Unlock()
+	format.placeholderMutex.Unlock()
 }
 
 // GetPlaceholders returns placeholders of given format.
@@ -74,22 +76,26 @@ func (format *Format) GetPlaceholders() map[string]Placeholder {
 
 // Reset resets state of given format.
 func (format *Format) Reset() {
-	format.mutex.Lock()
+	format.placeholderMutex.Lock()
 
 	format.replacements = []replacement{}
-	format.compileOnce = &sync.Once{}
+	format.compiled = false
 	cache.reset()
 
-	format.mutex.Unlock()
+	format.placeholderMutex.Unlock()
 }
 
 // Render generates string which will be used by Log instance.
 // Here is logLevel property just for a placeholders which want to show
 // logging level, logLevel will be passed to all ran placeholders.
 func (format *Format) Render(logLevel Level, prefix string) string {
-	format.compileOnce.Do(format.compile)
+	format.compileMutex.Lock()
+	if !format.compiled {
+		format.compile()
+	}
+	format.compileMutex.Unlock()
 
-	format.mutex.RLock()
+	format.placeholderMutex.RLock()
 	rendered := format.formatting
 	for _, replacement := range format.replacements {
 		var placeholderValue string
@@ -103,7 +109,7 @@ func (format *Format) Render(logLevel Level, prefix string) string {
 			rendered, replacement.value, placeholderValue, 1,
 		)
 	}
-	format.mutex.RUnlock()
+	format.placeholderMutex.RUnlock()
 
 	rendered = strings.Replace(rendered, `${prefix}`, getPrefix(prefix), 1)
 
@@ -117,7 +123,7 @@ func (format *Format) compile() {
 	var placeholder Placeholder
 	var ok bool
 
-	format.mutex.RLock()
+	format.placeholderMutex.RLock()
 	matches := rePlaceholder.FindAllStringSubmatch(format.formatting, -1)
 	for _, match := range matches {
 		var (
@@ -140,7 +146,9 @@ func (format *Format) compile() {
 
 		format.replacements = append(format.replacements, newReplacement)
 	}
-	format.mutex.RUnlock()
+	format.placeholderMutex.RUnlock()
+
+	format.compiled = true
 }
 
 func getPrefix(prefix string) string {
