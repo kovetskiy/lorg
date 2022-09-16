@@ -11,7 +11,7 @@ import (
 // Do not instantiate Format instance without using NewFormat.
 type Format struct {
 	formatting   string
-	compiled     bool
+	compileOnce  *sync.Once
 	replacements []replacement
 	placeholders map[string]Placeholder
 	mutex        *sync.RWMutex
@@ -77,7 +77,7 @@ func (format *Format) Reset() {
 	format.mutex.Lock()
 
 	format.replacements = []replacement{}
-	format.compiled = false
+	format.compileOnce = &sync.Once{}
 	cache.reset()
 
 	format.mutex.Unlock()
@@ -87,9 +87,7 @@ func (format *Format) Reset() {
 // Here is logLevel property just for a placeholders which want to show
 // logging level, logLevel will be passed to all ran placeholders.
 func (format *Format) Render(logLevel Level, prefix string) string {
-	if !format.compiled {
-		format.compile()
-	}
+	format.compileOnce.Do(format.compile)
 
 	format.mutex.RLock()
 	rendered := format.formatting
@@ -143,8 +141,6 @@ func (format *Format) compile() {
 		format.replacements = append(format.replacements, newReplacement)
 	}
 	format.mutex.RUnlock()
-
-	format.compiled = true
 }
 
 func getPrefix(prefix string) string {

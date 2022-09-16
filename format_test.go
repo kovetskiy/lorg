@@ -374,10 +374,8 @@ func TestFormat_Reset_DesolatesReplacementAndUnsetsCompiledFlag(
 	format.Render(LevelWarning, "")
 
 	test.NotEmpty(format.replacements)
-	test.True(format.compiled)
 
 	format.Reset()
 
 	test.Empty(format.replacements)
-	test.False(format.compiled)
 }

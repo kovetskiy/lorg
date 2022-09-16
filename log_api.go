@@ -45,13 +45,13 @@ type Log struct {
 }
 
 // NewLog creates a new Log instance with default configuration:
-// *   default logging level is the LevelInfo, which can be changed
-//         using log.SetLevel(Level) method
-// *   default logging format is the Format{} instance, which implements
-//         Formatter interface and can be changed
-//         using log.SetFormat(Formatter) method
-// *   default logging output is a stderr (os.Stderr), but also can be changed
-//         using log.SetOutput(io.Writer) method
+//   - default logging level is the LevelInfo, which can be changed
+//     using log.SetLevel(Level) method
+//   - default logging format is the Format{} instance, which implements
+//     Formatter interface and can be changed
+//     using log.SetFormat(Formatter) method
+//   - default logging output is a stderr (os.Stderr), but also can be changed
+//     using log.SetOutput(io.Writer) method
 func NewLog() *Log {
 	log := &Log{
 		level:  defaultLevel,
@@ -62,6 +62,10 @@ func NewLog() *Log {
 	}
 
 	return log
+}
+
+func (log *Log) setMutex(mutex *sync.Mutex) {
+	log.mutex = mutex
 }
 
 // SetExiter sets given function as callback for Fatal messages, this function
@@ -133,8 +137,8 @@ func (log *Log) SetOutput(output io.Writer) {
 // following:
 //
 // [INFO] before-new-line
-//        after-new-line
 //
+//	after-new-line
 func (log *Log) SetIndentLines(value bool) {
 	log.indentLines = value
 }
@@ -143,7 +147,8 @@ func (log *Log) SetIndentLines(value bool) {
 //
 // SetShiftIndent(len("[INFO] "))
 // [INFO] before-new-line
-//        after-new-line
+//
+//	after-new-line
 func (log *Log) SetShiftIndent(shift int) {
 	log.shiftIndent = shift
 }

@@ -3,6 +3,7 @@ package lorg
 import (
 	"bytes"
 	stdlog "log"
+	"sync"
 	"testing"
 )
 
@@ -15,8 +16,14 @@ func BenchmarkLog_Printf_Parallel(b *testing.B) {
 	log.SetOutput(&buffer)
 	log.format.Reset()
 
+	bufferMutex := &sync.Mutex{}
+
+	log.setMutex(bufferMutex)
+
 	b.RunParallel(func(pb *testing.PB) {
+		bufferMutex.Lock()
 		buffer.Reset()
+		bufferMutex.Unlock()
 		for pb.Next() {
 			log.Printf("%v", logString)
 		}

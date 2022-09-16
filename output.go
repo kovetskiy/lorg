@@ -19,12 +19,12 @@ type Output struct {
 func NewOutput(stderr io.Writer) *Output {
 	return &Output{
 		conditions: map[Level][]io.Writer{
-			LevelFatal:   []io.Writer{stderr},
-			LevelError:   []io.Writer{stderr},
-			LevelWarning: []io.Writer{stderr},
-			LevelInfo:    []io.Writer{stderr},
-			LevelDebug:   []io.Writer{stderr},
-			LevelTrace:   []io.Writer{stderr},
+			LevelFatal:   {stderr},
+			LevelError:   {stderr},
+			LevelWarning: {stderr},
+			LevelInfo:    {stderr},
+			LevelDebug:   {stderr},
+			LevelTrace:   {stderr},
 		},
 		mutex: &sync.Mutex{},
 	}
@@ -53,6 +53,7 @@ func (output *Output) WriteWithLevel(
 
 	writers, ok := output.conditions[level]
 	if !ok {
+		output.mutex.Unlock()
 		return 0, fmt.Errorf("there is no writers for level %s", level)
 	}
 
