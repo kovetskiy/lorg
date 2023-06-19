@@ -1,10 +1,10 @@
 module github.com/kovetskiy/lorg
 
-go 1.18
+go 1.19
 
 require (
-	github.com/stretchr/testify v1.8.0
-	github.com/zazab/zhash v0.0.0-20210630080733-6e809466f8d3
+	github.com/stretchr/testify v1.8.4
+	github.com/zazab/zhash v0.0.0-20221031090444-2b0d50417446
 )
 
 require (
